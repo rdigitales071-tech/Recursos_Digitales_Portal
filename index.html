@@ -1,0 +1,2324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#1a1a4e"/>
+<title>Let's Learn To Be! 🌟</title>
+<link rel="manifest" href="manifest.json"/>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* =========================================
+   DESIGN SYSTEM — Vibrant Edu Theme
+   ========================================= */
+:root{
+  --ink:#1a1a4e;
+  --ink2:#2d2d6e;
+  --purple:#5c35d4;
+  --purple-l:#7c5af0;
+  --purple-d:#3d1fa8;
+  --cyan:#00d4ff;
+  --pink:#ff4b91;
+  --yellow:#ffd93d;
+  --green:#06d6a0;
+  --red:#ff5757;
+  --am:#ff4b91;
+  --is:#00b4d8;
+  --are:#06d6a0;
+  --bg:#f5f4ff;
+  --card:#ffffff;
+  --border:#e0dcff;
+  --text:#1a1a4e;
+  --muted:#6b6ba3;
+  --shadow:0 8px 32px rgba(92,53,212,.13);
+  --shadow-lg:0 16px 48px rgba(92,53,212,.22);
+  --r:20px;
+  --r-sm:12px;
+  --font-h:'Baloo 2',cursive;
+  --font-b:'Poppins',sans-serif;
+  --topbar:64px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:var(--font-b)}ul{list-style:none}
+img{max-width:100%;display:block}
+
+/* ── SCREEN MANAGER ── */
+/* Body locked while login is active — prevents any scroll to content below */
+body.locked{overflow:hidden;height:100vh}
+
+.screen{display:none!important;visibility:hidden;pointer-events:none}
+.screen.active{display:block!important;visibility:visible;pointer-events:all}
+
+/* Login takes over the ENTIRE viewport — fixed, no scroll */
+#screen-login{
+  position:fixed!important;
+  inset:0!important;
+  z-index:9999!important;
+  overflow-y:auto;
+}
+
+/* App and Teacher screens are normal flow but hidden until authenticated */
+#screen-app, #screen-teacher{
+  position:relative;
+}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem 1.6rem;border:none;border-radius:50px;font-family:var(--font-b);font-weight:700;font-size:.95rem;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);line-height:1}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple-l));color:#fff;box-shadow:0 4px 18px rgba(92,53,212,.4)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(92,53,212,.5)}
+.btn-secondary{background:#fff;color:var(--purple);border:2.5px solid var(--purple)}
+.btn-secondary:hover{background:var(--purple);color:#fff}
+.btn-danger{background:linear-gradient(135deg,#ff5757,#ff9f43);color:#fff;box-shadow:0 4px 18px rgba(255,87,87,.35)}
+.btn-danger:hover{transform:translateY(-2px)}
+.btn-green{background:linear-gradient(135deg,var(--green),#38f9b0);color:var(--ink);box-shadow:0 4px 18px rgba(6,214,160,.35)}
+.btn-yellow{background:linear-gradient(135deg,var(--yellow),#ffb347);color:var(--ink);box-shadow:0 4px 18px rgba(255,217,61,.4)}
+.btn-full{width:100%;display:flex}
+.btn-lg{padding:1rem 2.2rem;font-size:1.1rem}
+.btn:active{transform:scale(.97)}
+
+/* ── INPUT ── */
+.field{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1.1rem}
+.field label{font-weight:700;font-size:.9rem;color:var(--ink2)}
+.field input,.field select{padding:.75rem 1rem;border:2.5px solid var(--border);border-radius:var(--r-sm);font-family:var(--font-b);font-size:.95rem;color:var(--text);background:#fafafe;transition:.25s;outline:none}
+.field input:focus,.field select:focus{border-color:var(--purple);box-shadow:0 0 0 4px rgba(92,53,212,.12)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+
+/* ── CARD ── */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:1.5rem;transition:.25s}
+.card:hover{box-shadow:var(--shadow-lg)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:.7rem 1.6rem;border-radius:40px;font-weight:700;font-size:.9rem;z-index:2000;opacity:0;pointer-events:none;transition:.35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+#toast.on{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .75rem;border-radius:20px;font-size:.78rem;font-weight:700}
+.badge-purple{background:rgba(92,53,212,.12);color:var(--purple)}
+.badge-green{background:rgba(6,214,160,.15);color:#059a73}
+.badge-pink{background:rgba(255,75,145,.12);color:var(--pink)}
+.badge-yellow{background:rgba(255,217,61,.2);color:#c68000}
+
+/* ── HELP BUTTONS (login screen) ── */
+.help-btns{display:flex;gap:.6rem;justify-content:center;margin-bottom:.75rem;flex-wrap:wrap}
+.help-btn{display:inline-flex;align-items:center;gap:.4rem;padding:.45rem 1rem;border:1.5px solid rgba(255,255,255,.2);border-radius:30px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.75);font-size:.8rem;font-weight:700;font-family:var(--font-b);cursor:pointer;transition:.25s;backdrop-filter:blur(6px)}
+.help-btn:hover{background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.45);transform:translateY(-2px)}
+.help-student:hover{border-color:var(--cyan);color:var(--cyan)}
+.help-teacher-m:hover{border-color:var(--purple-l);color:var(--purple-l)}
+
+/* ── MANUAL OVERLAY ── */
+.manual-overlay{position:fixed;inset:0;z-index:10000;background:rgba(10,8,40,.82);backdrop-filter:blur(10px);display:flex;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;animation:fadeIn .25s}
+.manual-box{background:var(--card);border-radius:24px;width:min(780px,100%);box-shadow:0 24px 80px rgba(0,0,0,.5);margin:auto;display:flex;flex-direction:column;max-height:92vh;overflow:hidden}
+
+/* Manual header */
+.manual-header{display:flex;align-items:center;justify-content:space-between;padding:1.3rem 1.6rem;flex-shrink:0}
+.mh-student{background:linear-gradient(135deg,var(--purple),var(--purple-l))}
+.mh-teacher{background:linear-gradient(135deg,var(--ink),var(--ink2))}
+.manual-header-text{display:flex;align-items:center;gap:1rem;color:#fff}
+.manual-icon{font-size:2.2rem;flex-shrink:0}
+.manual-title{font-family:var(--font-h);font-size:1.3rem;font-weight:900;color:#fff;margin:0}
+.manual-sub{font-size:.78rem;color:rgba(255,255,255,.6);margin:0}
+.manual-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:1rem;cursor:pointer;flex-shrink:0;transition:.2s;display:flex;align-items:center;justify-content:center}
+.manual-close:hover{background:rgba(255,255,255,.35)}
+
+/* Manual body */
+.manual-body{overflow-y:auto;padding:1.4rem 1.6rem;flex:1;display:flex;flex-direction:column;gap:1.2rem}
+.manual-section{display:flex;flex-direction:column;gap:.75rem}
+.msec-title{font-family:var(--font-h);font-size:1.1rem;font-weight:800;color:var(--purple);padding-bottom:.4rem;border-bottom:2px solid var(--border)}
+.msec-text{font-size:.9rem;line-height:1.75;color:var(--ink2)}
+
+/* Highlight box */
+.manual-highlight{display:flex;align-items:flex-start;gap:.75rem;background:rgba(92,53,212,.07);border-left:4px solid var(--purple);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:.8rem 1rem;font-size:.88rem;font-weight:600;color:var(--ink2)}
+.mh-ink{background:rgba(26,26,78,.06);border-left-color:var(--cyan)}
+.mh-icon{font-size:1.2rem;flex-shrink:0;margin-top:.05rem}
+
+/* Steps */
+.manual-steps{display:flex;flex-direction:column;gap:.55rem}
+.mstep{display:flex;align-items:flex-start;gap:.85rem;background:var(--bg);border-radius:var(--r-sm);padding:.75rem 1rem}
+.mstep-t{background:rgba(26,26,78,.04)}
+.mstep-num{width:28px;height:28px;border-radius:50%;background:var(--purple);color:#fff;font-weight:900;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mn-t{background:var(--ink)}
+.mstep-text{font-size:.88rem;line-height:1.6;color:var(--ink2)}
+.mstep-text strong{color:var(--ink)}
+
+/* Tip */
+.manual-tip{background:rgba(255,217,61,.12);border:1px solid rgba(255,217,61,.35);border-radius:var(--r-sm);padding:.65rem .9rem;font-size:.83rem;font-weight:600;color:var(--ink2)}
+
+/* Credentials box */
+.cred-box{background:var(--ink);border-radius:var(--r-sm);padding:.9rem 1.1rem;display:flex;flex-direction:column;gap:.5rem}
+.cred-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.cred-label{font-size:.82rem;font-weight:700;color:rgba(255,255,255,.5);min-width:110px}
+.cred-value{font-family:monospace;font-size:.95rem;font-weight:800;color:var(--cyan);background:rgba(255,255,255,.07);padding:.25rem .65rem;border-radius:6px;letter-spacing:.03em}
+
+/* Cards */
+.manual-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem}
+.mcard{display:flex;align-items:flex-start;gap:.75rem;background:var(--bg);border-radius:var(--r-sm);padding:.9rem 1rem;border:1.5px solid var(--border);transition:.2s}
+.mcard:hover{border-color:var(--purple-l);background:rgba(92,53,212,.04)}
+.mcard-icon{font-size:1.6rem;flex-shrink:0}
+.mcard-body{font-size:.85rem;color:var(--ink2)}
+.mcard-body strong{color:var(--ink);display:block;margin-bottom:.25rem;font-size:.9rem}
+.mcard-body p{margin:0;line-height:1.5}
+
+/* Table */
+.manual-table-wrap{overflow-x:auto;border-radius:var(--r-sm);border:1.5px solid var(--border)}
+.manual-table{width:100%;border-collapse:collapse;font-size:.85rem}
+.manual-table th{background:var(--ink);color:#fff;padding:.6rem .85rem;text-align:left;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em}
+.manual-table td{padding:.55rem .85rem;border-bottom:1px solid var(--border);color:var(--ink2);vertical-align:top;line-height:1.5}
+.manual-table tr:last-child td{border-bottom:none}
+.manual-table tr:nth-child(even) td{background:var(--bg)}
+
+/* Levels */
+.manual-levels{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:.5rem}
+.mlevel{flex:1;min-width:80px;border-radius:var(--r-sm);padding:.65rem .4rem;text-align:center;font-weight:800;font-size:.82rem;line-height:1.4}
+.mlevel small{font-weight:600;font-size:.72rem;display:block;margin-top:.2rem}
+.l1{background:rgba(6,214,160,.12);color:#059a73;border:1.5px solid rgba(6,214,160,.3)}
+.l2{background:rgba(255,217,61,.12);color:#c68000;border:1.5px solid rgba(255,217,61,.35)}
+.l3{background:rgba(0,180,216,.12);color:#007fa3;border:1.5px solid rgba(0,180,216,.3)}
+.l4{background:rgba(255,75,145,.12);color:var(--pink);border:1.5px solid rgba(255,75,145,.3)}
+.l5{background:rgba(92,53,212,.12);color:var(--purple);border:1.5px solid rgba(92,53,212,.3)}
+
+/* Tip list */
+.manual-tip-list{display:flex;flex-direction:column;gap:.5rem}
+.mtip{background:var(--bg);border-radius:var(--r-sm);padding:.65rem .9rem;font-size:.87rem;color:var(--ink2);line-height:1.5;border-left:3px solid var(--purple)}
+
+/* Manual footer */
+.manual-footer{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.6rem;border-top:1.5px solid var(--border);background:var(--bg);border-radius:0 0 24px 24px;flex-shrink:0;flex-wrap:wrap;gap:.75rem}
+.manual-footer span{font-size:.75rem;color:var(--muted)}
+
+@media(max-width:520px){
+  .manual-body{padding:1rem}
+  .manual-header{padding:1rem}
+  .manual-footer{padding:.85rem 1rem}
+  .manual-cards{grid-template-columns:1fr}
+  .manual-levels{gap:.3rem}
+  .mlevel{min-width:60px;font-size:.72rem}
+}
+
+/* =========================================
+   ██ LOGIN SCREEN
+   ========================================= */
+#screen-login{
+  min-height:100vh;
+  background:linear-gradient(155deg,#0f0c29 0%,#302b63 50%,#24243e 100%);
+  display:flex!important;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:1rem;
+}
+/* Animated stars */
+.stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite var(--delay,0s)}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(1)}50%{opacity:.9;transform:scale(1.4)}}
+
+.login-wrap{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;gap:1rem;width:min(460px,100%)}
+
+.login-hero{text-align:center;color:#fff}
+.login-emoji-ring{font-size:4.5rem;display:block;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(0,212,255,.6))}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+.login-title{font-family:var(--font-h);font-size:clamp(2rem,6vw,3rem);font-weight:900;margin:.3rem 0 0;background:linear-gradient(90deg,#00d4ff,#7c5af0,#ff4b91);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
+.login-sub{font-size:.95rem;opacity:.7;margin-top:.4rem}
+
+.login-card{background:rgba(255,255,255,.07);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1.5px solid rgba(255,255,255,.15);border-radius:28px;padding:2rem 1.8rem;width:100%}
+.login-divider{display:flex;align-items:center;gap:.75rem;margin:1.2rem 0;color:rgba(255,255,255,.4);font-size:.8rem}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.15)}
+.login-card .field label{color:rgba(255,255,255,.85)}
+.login-card .field input{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:#fff}
+.login-card .field input::placeholder{color:rgba(255,255,255,.4)}
+.login-card .field input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(0,212,255,.2)}
+
+.teacher-link{color:rgba(255,255,255,.55);font-size:.82rem;text-align:center;cursor:pointer;transition:.2s}
+.teacher-link:hover{color:var(--cyan)}
+.teacher-link span{text-decoration:underline}
+
+/* ── Role selector ── */
+.role-selector{display:flex;flex-direction:column;gap:.85rem;width:100%}
+.role-btn{display:flex;align-items:center;gap:1rem;padding:1.2rem 1.4rem;border:2px solid rgba(255,255,255,.15);border-radius:20px;background:rgba(255,255,255,.06);backdrop-filter:blur(12px);color:#fff;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);text-align:left;font-family:var(--font-b);width:100%}
+.role-btn:hover{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.12);transform:translateY(-2px)}
+.role-student:hover{border-color:var(--cyan)}
+.role-teacher:hover{border-color:var(--pink)}
+.role-icon{font-size:2rem;flex-shrink:0}
+.role-label{font-weight:800;font-size:1rem;display:block}
+.role-sub{font-size:.78rem;opacity:.55;display:block;margin-top:.15rem}
+
+/* ── Login panels ── */
+.back-btn{background:none;border:none;color:rgba(255,255,255,.5);font-size:.83rem;font-weight:700;cursor:pointer;padding:.2rem 0;margin-bottom:.85rem;font-family:var(--font-b);transition:.2s;display:flex;align-items:center;gap:.3rem}
+.back-btn:hover{color:#fff}
+.panel-title{font-family:var(--font-h);font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:1rem}
+
+/* =========================================
+   ██ TEACHER LOGIN MODAL
+   ========================================= */
+.modal-bg{position:fixed;inset:0;z-index:800;background:rgba(10,8,40,.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn .25s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-box{background:var(--card);border-radius:28px;width:min(420px,100%);box-shadow:0 24px 80px rgba(0,0,0,.4);animation:slideUp .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.modal-top{background:linear-gradient(135deg,var(--ink),var(--ink2));padding:1.4rem 1.6rem;border-radius:28px 28px 0 0;display:flex;align-items:center;justify-content:space-between}
+.modal-top h3{font-family:var(--font-h);color:#fff;font-size:1.2rem;display:flex;align-items:center;gap:.5rem}
+.modal-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.modal-close:hover{background:rgba(255,255,255,.3)}
+.modal-body{padding:1.6rem}
+.modal-foot{padding:0 1.6rem 1.4rem;display:flex;gap:.75rem}
+.modal-foot .btn{flex:1}
+
+/* =========================================
+   ██ TEACHER DASHBOARD
+   ========================================= */
+#screen-teacher{
+  min-height:100vh;
+  background:linear-gradient(155deg,#0f0c29 0%,#1e1b4b 100%);
+  padding:1rem;
+}
+.teacher-topbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.2rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);margin-bottom:1.5rem}
+.teacher-topbar-l{display:flex;align-items:center;gap:.75rem;color:#fff}
+.teacher-topbar-l .t-logo{font-family:var(--font-h);font-size:1.2rem;background:linear-gradient(90deg,var(--cyan),var(--purple-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.teacher-topbar-r{display:flex;gap:.5rem}
+
+.teacher-hero{text-align:center;color:#fff;margin-bottom:2rem}
+.teacher-hero h2{font-family:var(--font-h);font-size:clamp(1.6rem,4vw,2.2rem);font-weight:900;margin-bottom:.3rem}
+.teacher-hero p{opacity:.6;font-size:.9rem}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem}
+.stat-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:1.2rem;text-align:center;color:#fff}
+.stat-num{font-family:var(--font-h);font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--purple-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-label{font-size:.8rem;opacity:.6;margin-top:.2rem}
+
+.teacher-table-wrap{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);overflow:hidden;margin-bottom:1rem}
+.teacher-table{width:100%;border-collapse:collapse;color:#fff;font-size:.9rem}
+.teacher-table th{background:rgba(92,53,212,.3);padding:.75rem 1rem;text-align:left;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.7)}
+.teacher-table td{padding:.7rem 1rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.teacher-table tr:last-child td{border-bottom:none}
+.teacher-table tr:hover td{background:rgba(255,255,255,.04)}
+.rank-icon{font-size:1.1rem}
+.score-pill{display:inline-flex;align-items:center;gap:.3rem;background:rgba(92,53,212,.3);padding:.2rem .6rem;border-radius:20px;font-weight:700;font-size:.85rem}
+.level-pill{display:inline-flex;padding:.15rem .55rem;border-radius:10px;font-size:.78rem;font-weight:600;background:rgba(6,214,160,.2);color:var(--green)}
+.teacher-empty{text-align:center;padding:2.5rem;color:rgba(255,255,255,.4);font-size:.95rem}
+.teacher-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.75rem}
+
+/* =========================================
+   ██ MAIN APP LAYOUT
+   ========================================= */
+#screen-app{display:flex!important;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:400;height:var(--topbar);background:rgba(26,26,78,.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;padding:0 1rem;gap:.5rem}
+.topbar-l{display:flex;align-items:center;gap:.75rem}
+.hamburger{background:rgba(255,255,255,.1);border:none;color:#fff;width:38px;height:38px;border-radius:10px;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:.2s}
+.hamburger:hover{background:rgba(255,255,255,.2)}
+.t-brand{font-family:var(--font-h);font-size:1.15rem;font-weight:800;background:linear-gradient(90deg,var(--cyan),var(--purple-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap}
+.topbar-r{display:flex;align-items:center;gap:.5rem}
+.student-chip{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:30px;padding:.3rem .85rem;font-size:.82rem;font-weight:700;color:#fff;max-width:140px;overflow:hidden}
+.student-chip .s-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.score-chip{display:flex;align-items:center;gap:.3rem;background:linear-gradient(135deg,rgba(255,217,61,.2),rgba(255,179,71,.15));border:1px solid rgba(255,217,61,.3);border-radius:30px;padding:.3rem .75rem;font-size:.85rem;font-weight:800;color:var(--yellow)}
+.btn-exit{background:rgba(255,87,87,.15);border:1px solid rgba(255,87,87,.3);color:#ff9999;border-radius:8px;padding:.3rem .6rem;font-size:.78rem;font-weight:700;transition:.2s}
+.btn-exit:hover{background:rgba(255,87,87,.3)}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:-280px;bottom:0;z-index:500;width:270px;background:linear-gradient(180deg,#0f0c29 0%,#1e1b4b 100%);border-right:1px solid rgba(255,255,255,.08);transition:.35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar.open{left:0;box-shadow:4px 0 40px rgba(0,0,0,.5)}
+.sidebar-head{display:flex;align-items:center;justify-content:space-between;padding:1rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-brand{font-family:var(--font-h);font-size:1.1rem;background:linear-gradient(90deg,var(--cyan),var(--purple-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sb-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:1rem;cursor:pointer}
+
+.nav-items{padding:.75rem 0;flex:1}
+.nav-a{display:flex;align-items:center;gap:.75rem;padding:.7rem 1rem;color:rgba(255,255,255,.55);font-weight:600;font-size:.9rem;border-radius:0 30px 30px 0;margin-right:.75rem;cursor:pointer;transition:.2s;border:none;background:none;width:100%;text-align:left}
+.nav-a:hover,.nav-a.active{background:linear-gradient(90deg,rgba(92,53,212,.3),rgba(124,90,240,.1));color:#fff}
+.nav-a.active{border-left:3px solid var(--purple-l)}
+.nav-icon-wrap{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;background:rgba(255,255,255,.07);flex-shrink:0}
+
+.sb-progress{padding:1rem;border-top:1px solid rgba(255,255,255,.08)}
+.sb-progress-label{font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:.5rem;font-weight:600}
+.sb-bar-wrap{background:rgba(255,255,255,.1);border-radius:20px;height:8px;overflow:hidden;margin-bottom:.4rem}
+.sb-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple-l));border-radius:20px;transition:width .6s ease}
+.sb-level-text{font-size:.78rem;color:rgba(255,255,255,.6);font-weight:700}
+
+.overlay{position:fixed;inset:0;z-index:450;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.3s}
+.overlay.on{opacity:1;pointer-events:all}
+
+/* MAIN CONTENT */
+.main{margin-top:var(--topbar);padding:1.2rem;flex:1;max-width:940px;margin-left:auto;margin-right:auto;width:100%}
+.sec{display:none;animation:secIn .4s ease}
+.sec.active{display:block}
+@keyframes secIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.sec-head{margin-bottom:1.5rem}
+.sec-head h2{font-family:var(--font-h);font-size:clamp(1.5rem,4vw,2rem);font-weight:900;color:var(--ink);display:flex;align-items:center;gap:.5rem}
+.sec-head p{color:var(--muted);margin-top:.25rem;font-size:.9rem}
+
+/* FOOTER */
+.app-footer{background:var(--ink);color:rgba(255,255,255,.5);text-align:center;padding:.85rem 1rem;font-size:.78rem;line-height:1.7}
+.app-footer strong{color:rgba(255,255,255,.8)}
+
+/* =========================================
+   ██ HOME SECTION
+   ========================================= */
+.home-banner{
+  background:linear-gradient(135deg,#1a1a4e 0%,#302b63 50%,#24243e 100%);
+  border-radius:var(--r);padding:2rem;color:#fff;margin-bottom:1.5rem;
+  position:relative;overflow:hidden;
+  box-shadow:0 12px 40px rgba(26,26,78,.35);
+}
+.home-banner::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(0,212,255,.2),transparent 70%);border-radius:50%}
+.home-banner::after{content:'';position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(255,75,145,.15),transparent 70%);border-radius:50%}
+.banner-content{position:relative;z-index:2}
+.banner-greeting{font-size:.85rem;opacity:.6;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.banner-name{font-family:var(--font-h);font-size:clamp(1.8rem,5vw,2.6rem);font-weight:900;margin:.2rem 0;background:linear-gradient(90deg,#fff,var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.banner-meta{display:flex;align-items:center;gap:.75rem;margin:.5rem 0 1rem;flex-wrap:wrap}
+.banner-level{display:flex;align-items:center;gap:.3rem;background:rgba(255,255,255,.12);border-radius:20px;padding:.3rem .8rem;font-size:.82rem;font-weight:700}
+.banner-points{display:flex;align-items:center;gap:.3rem;background:rgba(255,217,61,.2);border-radius:20px;padding:.3rem .8rem;font-size:.82rem;font-weight:700;color:var(--yellow)}
+.banner-cta{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:.5rem 1rem;font-size:.85rem;font-weight:700;color:#fff;cursor:pointer;transition:.2s}
+.banner-cta:hover{background:rgba(255,255,255,.22)}
+.banner-illustrations{position:absolute;right:1.5rem;top:50%;transform:translateY(-50%);font-size:4rem;line-height:1;text-align:center;z-index:1}
+
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;margin-bottom:1.5rem}
+.mod-card{background:var(--card);border-radius:var(--r);padding:1.4rem;cursor:pointer;transition:.25s cubic-bezier(.34,1.56,.64,1);border:2px solid transparent;position:relative;overflow:hidden}
+.mod-card::before{content:'';position:absolute;inset:0;opacity:0;transition:.3s}
+.mod-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.mod-card:hover::before{opacity:1}
+.mod-card.c1::before{background:linear-gradient(135deg,rgba(92,53,212,.06),transparent)}
+.mod-card.c2::before{background:linear-gradient(135deg,rgba(0,212,255,.06),transparent)}
+.mod-card.c3::before{background:linear-gradient(135deg,rgba(255,75,145,.06),transparent)}
+.mod-card.c4::before{background:linear-gradient(135deg,rgba(6,214,160,.06),transparent)}
+.mod-card.c5::before{background:linear-gradient(135deg,rgba(255,217,61,.06),transparent)}
+.mod-card.c6::before{background:linear-gradient(135deg,rgba(255,87,87,.06),transparent)}
+.mod-card.featured{border-color:var(--pink)}
+.mod-icon-wrap{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin-bottom:.85rem}
+.ic-purple{background:linear-gradient(135deg,rgba(92,53,212,.15),rgba(124,90,240,.1))}
+.ic-cyan{background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(0,180,216,.1))}
+.ic-pink{background:linear-gradient(135deg,rgba(255,75,145,.15),rgba(255,100,170,.1))}
+.ic-green{background:linear-gradient(135deg,rgba(6,214,160,.15),rgba(56,249,176,.1))}
+.ic-yellow{background:linear-gradient(135deg,rgba(255,217,61,.2),rgba(255,179,71,.1))}
+.ic-red{background:linear-gradient(135deg,rgba(255,87,87,.15),rgba(255,159,67,.1))}
+.mod-card h3{font-family:var(--font-h);font-size:1.05rem;font-weight:800;margin-bottom:.3rem}
+.mod-card p{color:var(--muted);font-size:.83rem;line-height:1.5}
+.mod-tag{display:inline-block;margin-top:.75rem;font-size:.72rem;font-weight:800;padding:.2rem .65rem;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
+.tag-purple{background:rgba(92,53,212,.1);color:var(--purple)}
+.tag-cyan{background:rgba(0,212,255,.12);color:#0099bb}
+.tag-pink{background:rgba(255,75,145,.12);color:var(--pink)}
+.tag-green{background:rgba(6,214,160,.15);color:#059a73}
+.tag-yellow{background:rgba(255,217,61,.2);color:#c68000}
+.tag-hot{background:var(--pink);color:#fff}
+
+.mot-strip{background:linear-gradient(90deg,rgba(255,217,61,.15),rgba(255,217,61,.05));border:1.5px solid rgba(255,217,61,.3);border-radius:var(--r);padding:1rem 1.4rem;display:flex;align-items:center;gap:1rem;font-weight:700;color:var(--ink2)}
+.mot-emoji{font-size:2rem;flex-shrink:0}
+
+/* =========================================
+   ██ LEARN SECTION
+   ========================================= */
+.tab-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.2rem}
+.t-btn{padding:.45rem 1rem;border:2px solid var(--border);border-radius:30px;background:#fff;font-weight:700;font-size:.83rem;color:var(--muted);transition:.2s;cursor:pointer;font-family:var(--font-b)}
+.t-btn:hover,.t-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+.tcontent{display:none;animation:secIn .3s}
+.tcontent.active{display:block}
+
+.theory-block{background:var(--card);border-radius:var(--r);padding:1.4rem;box-shadow:var(--shadow);margin-bottom:1rem}
+.theory-block h3{font-family:var(--font-h);font-size:1.25rem;color:var(--ink);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+
+/* Pronoun table */
+.pr-table{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:.5rem}
+.pr-table th{background:var(--ink);color:#fff;padding:.65rem .8rem;text-align:left;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+.pr-table th:first-child{border-radius:8px 0 0 0}
+.pr-table th:last-child{border-radius:0 8px 0 0}
+.pr-table td{padding:.6rem .8rem;border-bottom:1px solid var(--border)}
+.pr-table tr:last-child td{border-bottom:none}
+.am-row td:nth-child(2){color:var(--am);font-weight:800;font-size:1.05rem}
+.is-row td:nth-child(2){color:var(--is);font-weight:800;font-size:1.05rem}
+.are-row td:nth-child(2){color:var(--are);font-weight:800;font-size:1.05rem}
+.tip-bar{margin-top:1rem;background:linear-gradient(90deg,rgba(92,53,212,.08),rgba(124,90,240,.04));border-left:4px solid var(--purple);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:.75rem 1rem;font-weight:700;font-size:.88rem}
+
+/* Example cards */
+.ex-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+.ex-card{border-radius:var(--r);padding:1.2rem;position:relative;overflow:hidden}
+.ex-am{background:linear-gradient(135deg,rgba(255,75,145,.1),rgba(255,75,145,.03));border:2px solid rgba(255,75,145,.2)}
+.ex-is{background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(0,212,255,.03));border:2px solid rgba(0,212,255,.2)}
+.ex-are{background:linear-gradient(135deg,rgba(6,214,160,.1),rgba(6,214,160,.03));border:2px solid rgba(6,214,160,.2)}
+.ex-pron{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;opacity:.6}
+.ex-verb{font-family:var(--font-h);font-size:2.2rem;font-weight:900;line-height:1;margin:.15rem 0}
+.ex-am .ex-verb{color:var(--am)}
+.ex-is .ex-verb{color:var(--is)}
+.ex-are .ex-verb{color:var(--are)}
+.ex-lines p{font-size:.84rem;line-height:1.8}
+.ex-lines strong{font-weight:800}
+.ex-am .ex-lines strong{color:var(--am)}
+.ex-is .ex-lines strong{color:var(--is)}
+.ex-are .ex-lines strong{color:var(--are)}
+
+/* Negative/Question layouts */
+.neg-list,.q-list{display:flex;flex-direction:column;gap:.85rem;margin-top:.75rem}
+.neg-item,.q-item{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.neg-from,.q-from{background:var(--bg);padding:.4rem .85rem;border-radius:8px;font-size:.88rem;flex:1;min-width:140px}
+.arr{font-size:1.3rem;color:var(--purple);font-weight:900}
+.neg-to{background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.2);padding:.4rem .85rem;border-radius:8px;font-size:.88rem;flex:1;min-width:140px;color:var(--red)}
+.neg-to strong{color:var(--red)}
+.q-to{background:rgba(92,53,212,.08);border:1px solid rgba(92,53,212,.2);padding:.4rem .85rem;border-radius:8px;font-size:.88rem;flex:1;min-width:140px;color:var(--purple)}
+.q-to strong{color:var(--purple)}
+
+/* Visual situation cards for examples */
+.situation-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:.85rem;margin-top:.75rem}
+.sit-card{background:var(--card);border-radius:var(--r-sm);padding:1rem;box-shadow:var(--shadow);text-align:center;transition:.25s}
+.sit-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.sit-emoji{font-size:2.8rem;display:block;margin-bottom:.5rem}
+.sit-sentence{font-size:.88rem;font-weight:700;color:var(--ink);line-height:1.4}
+.sit-sentence em{font-style:normal;color:var(--purple);font-weight:900}
+.sit-trans{font-size:.75rem;color:var(--muted);margin-top:.3rem}
+
+.learn-cta{text-align:center;margin-top:1.5rem;display:flex;flex-direction:column;align-items:center;gap:.75rem}
+.learn-cta p{font-size:1rem;font-weight:700;color:var(--muted)}
+
+/* =========================================
+   ██ PRACTICE ADAPTIVE
+   ========================================= */
+.practice-wrap{max-width:620px;margin:0 auto}
+.practice-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+.lvl-badge{display:flex;align-items:center;gap:.3rem;padding:.3rem .9rem;border-radius:20px;font-size:.82rem;font-weight:800}
+.lvl-1{background:linear-gradient(135deg,var(--green),#38f9b0);color:var(--ink)}
+.lvl-2{background:linear-gradient(135deg,var(--yellow),#ffb347);color:var(--ink)}
+.lvl-3{background:linear-gradient(135deg,var(--pink),#ff9f43);color:#fff}
+.prac-score{font-weight:800;color:var(--purple)}
+.prac-counter{font-size:.82rem;color:var(--muted);font-weight:600}
+
+.q-card{background:var(--card);border-radius:var(--r);padding:2rem;box-shadow:var(--shadow);margin-bottom:1rem}
+.q-illustration{text-align:center;font-size:3.5rem;margin-bottom:1rem;animation:float 3s ease-in-out infinite}
+.q-text{font-family:var(--font-h);font-size:1.2rem;font-weight:800;color:var(--ink);margin-bottom:1.4rem;line-height:1.4}
+.opt-grid{display:grid;gap:.75rem}
+.opt-btn{padding:.85rem 1rem;background:var(--bg);border:2.5px solid var(--border);border-radius:var(--r-sm);font-size:.92rem;font-weight:700;font-family:var(--font-b);text-align:left;transition:.2s;color:var(--text);display:flex;align-items:center;gap:.5rem}
+.opt-btn:hover:not(:disabled){border-color:var(--purple);color:var(--purple);background:rgba(92,53,212,.05)}
+.opt-btn.right{background:rgba(6,214,160,.1);border-color:var(--green);color:#059a73}
+.opt-btn.wrong{background:rgba(255,87,87,.1);border-color:var(--red);color:var(--red)}
+.fb-box{margin-top:1rem;padding:.85rem 1rem;border-radius:var(--r-sm);font-weight:700;font-size:.92rem;display:none;animation:secIn .2s}
+.fb-ok{display:block!important;background:rgba(6,214,160,.12);color:#059a73;border:1px solid rgba(6,214,160,.3)}
+.fb-err{display:block!important;background:rgba(255,87,87,.1);color:var(--red);border:1px solid rgba(255,87,87,.25)}
+
+.prac-done{text-align:center;padding:2rem;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow)}
+.prac-done .big-icon{font-size:4rem;margin-bottom:.75rem}
+.prac-done h3{font-family:var(--font-h);font-size:1.7rem;color:var(--ink)}
+.prac-done p{color:var(--muted);margin:.4rem 0}
+.prac-done-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1.2rem}
+
+/* =========================================
+   ██ DRAG & DROP
+   ========================================= */
+.drag-wrap{max-width:680px;margin:0 auto}
+.drag-top{display:flex;justify-content:space-between;background:var(--card);border-radius:var(--r-sm);padding:.75rem 1rem;margin-bottom:1rem;font-weight:700;box-shadow:var(--shadow)}
+.drag-area{background:var(--card);border-radius:var(--r);padding:2rem;box-shadow:var(--shadow);margin-bottom:1rem;text-align:center}
+.drag-sentence{font-family:var(--font-h);font-size:1.35rem;font-weight:900;display:flex;align-items:center;justify-content:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.5rem}
+.drag-blank{display:inline-flex;align-items:center;justify-content:center;min-width:80px;height:42px;border-bottom:3.5px solid var(--purple);background:rgba(92,53,212,.06);border-radius:8px;padding:0 .6rem;color:var(--purple);font-size:1rem;font-weight:800;cursor:pointer;transition:.25s}
+.drag-blank.filled{background:var(--purple);color:#fff;border-color:var(--purple)}
+.drag-blank.ok{background:var(--green);color:#fff;border-color:var(--green)}
+.drag-blank.bad{background:var(--red);color:#fff;border-color:var(--red)}
+.drag-hint{font-size:.82rem;color:var(--muted);font-style:italic}
+.drag-scene{font-size:3rem;text-align:center;margin-bottom:.75rem;animation:float 3s ease-in-out infinite}
+.drag-opts{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:center;margin-bottom:1rem}
+.drag-chip{padding:.6rem 1.5rem;background:linear-gradient(135deg,var(--purple),var(--purple-l));color:#fff;border:none;border-radius:30px;font-size:1rem;font-weight:800;font-family:var(--font-b);cursor:pointer;box-shadow:0 4px 14px rgba(92,53,212,.35);transition:.25s cubic-bezier(.34,1.56,.64,1)}
+.drag-chip:hover{transform:translateY(-3px) scale(1.06)}
+.drag-chip.used{opacity:.3;pointer-events:none}
+.drag-fb{text-align:center;font-weight:800;font-size:.95rem;min-height:1.8rem;color:var(--purple)}
+.drag-nav{text-align:center}
+.drag-done{text-align:center;padding:2rem;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow)}
+
+/* =========================================
+   ██ KAHOOT
+   ========================================= */
+.kahoot-lobby{text-align:center;background:linear-gradient(155deg,var(--ink),#302b63);border-radius:var(--r);padding:3rem 2rem;color:#fff;box-shadow:var(--shadow-lg)}
+.kahoot-hero-icon{font-size:5rem;animation:float 3s ease-in-out infinite;display:block}
+.kahoot-lobby h3{font-family:var(--font-h);font-size:2rem;margin:.5rem 0 .3rem;background:linear-gradient(90deg,var(--cyan),var(--purple-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.kahoot-lobby p{opacity:.65;font-size:.9rem;margin-bottom:1.5rem}
+
+.kahoot-game-area{max-width:680px;margin:0 auto}
+.k-header{display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:var(--r);padding:1rem 1.4rem;box-shadow:var(--shadow);margin-bottom:1rem}
+.k-timer{position:relative;width:68px;height:68px;flex-shrink:0}
+.k-timer svg{transform:rotate(-90deg);width:100%;height:100%}
+.t-bg{fill:none;stroke:var(--border);stroke-width:7}
+.t-fill{fill:none;stroke:var(--purple);stroke-width:7;stroke-dasharray:201;stroke-dashoffset:0;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .3s}
+.t-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-h);font-size:1.3rem;font-weight:900;color:var(--purple)}
+.k-meta{text-align:right;font-weight:700}
+.k-meta strong{color:var(--purple);font-size:1.2rem}
+.k-q{background:linear-gradient(135deg,var(--ink),#302b63);color:#fff;border-radius:var(--r);padding:1.4rem;text-align:center;font-family:var(--font-h);font-size:1.15rem;font-weight:800;margin-bottom:1rem;box-shadow:var(--shadow-lg);min-height:75px;display:flex;align-items:center;justify-content:center}
+.k-opts{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.k-opt{padding:1.1rem;border:none;border-radius:var(--r);font-size:.95rem;font-weight:800;font-family:var(--font-b);color:#fff;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:.5rem;box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.k-opt:nth-child(1){background:linear-gradient(135deg,#e74c3c,#c0392b)}
+.k-opt:nth-child(2){background:linear-gradient(135deg,#2980b9,#1a5276)}
+.k-opt:nth-child(3){background:linear-gradient(135deg,#27ae60,#1e8449)}
+.k-opt:nth-child(4){background:linear-gradient(135deg,#e67e22,#ca6f1e)}
+.k-opt:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-2px)}
+.k-opt.ok-k{background:var(--green)!important;animation:pulse .4s}
+.k-opt.no-k{background:#555!important;opacity:.55}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.k-fb{text-align:center;font-size:1.1rem;font-weight:800;color:var(--purple);min-height:2.5rem;padding:.5rem;margin-top:.5rem}
+.kahoot-end{text-align:center;background:linear-gradient(155deg,var(--ink),#302b63);border-radius:var(--r);padding:3rem 2rem;color:#fff;box-shadow:var(--shadow-lg)}
+.end-trophy{font-size:5rem;display:block;animation:float 3s ease-in-out infinite}
+.kahoot-end h3{font-family:var(--font-h);font-size:2rem;margin:.5rem 0 .3rem}
+.kahoot-end p{opacity:.7;margin:.3rem 0}
+.kahoot-end-btns{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1.2rem}
+
+/* =========================================
+   ██ CLASSROOM
+   ========================================= */
+.steps-indicator{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:1.5rem}
+.st-dot{width:40px;height:40px;border-radius:50%;background:var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.95rem;transition:.3s}
+.st-dot.active{background:var(--purple);color:#fff}
+.st-dot.done{background:var(--green);color:#fff}
+.st-line{flex:1;max-width:80px;height:3px;background:var(--border);transition:.3s}
+.st-line.done{background:var(--green)}
+
+.cl-step{display:none}
+.cl-step.active{display:block;animation:secIn .4s}
+.cl-step h3{font-family:var(--font-h);font-size:1.3rem;color:var(--ink);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+
+.video-wrap{background:linear-gradient(135deg,#0f0c29,#1e1b4b);border-radius:var(--r);overflow:hidden;margin-bottom:1.2rem;box-shadow:var(--shadow-lg)}
+.video-label{display:flex;align-items:center;gap:.6rem;padding:.85rem 1.2rem;background:rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.08);color:#fff;font-weight:700;font-size:.92rem}
+#lesson-video{width:100%;max-height:420px;background:#000;display:block}
+#lesson-video:focus{outline:none}
+.video-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1.5rem;color:rgba(255,255,255,.55);text-align:center;gap:.5rem;min-height:200px}
+.video-empty-icon{font-size:3.5rem;opacity:.6}
+.video-empty-title{font-weight:800;font-size:1rem;color:rgba(255,255,255,.75)}
+.video-empty-sub{font-size:.82rem;max-width:320px;line-height:1.5}
+.video-actions{display:flex;align-items:center;gap:.75rem;padding:1rem 1.2rem;flex-wrap:wrap}
+.video-formats{font-size:.75rem;color:rgba(255,255,255,.3);padding:0 1.2rem .85rem;line-height:1.5}
+
+.rule-showcase{background:var(--card);border-radius:var(--r);padding:1.4rem;box-shadow:var(--shadow);margin-bottom:1.2rem}
+.rule-showcase h4{font-family:var(--font-h);font-size:1.1rem;color:var(--ink);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.rule-row{display:flex;gap:.75rem;flex-wrap:wrap}
+.rule-pill{flex:1;min-width:120px;border-radius:var(--r-sm);padding:1rem;text-align:center;font-weight:800}
+.rp-am{background:rgba(255,75,145,.1);border:2px solid rgba(255,75,145,.25);color:var(--am)}
+.rp-is{background:rgba(0,212,255,.1);border:2px solid rgba(0,212,255,.25);color:var(--is)}
+.rp-are{background:rgba(6,214,160,.1);border:2px solid rgba(6,214,160,.25);color:var(--are)}
+.rule-pill .rp-pro{font-size:.75rem;opacity:.7;display:block;margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.05em}
+.rule-pill .rp-verb{font-family:var(--font-h);font-size:1.8rem}
+
+.guided-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem}
+.g-item{background:var(--card);border-radius:var(--r-sm);padding:1rem 1.2rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:.65rem;font-weight:700;font-size:.95rem;flex-wrap:wrap}
+.g-item select{padding:.38rem .65rem;border:2px solid var(--border);border-radius:8px;font-family:var(--font-b);font-weight:700;font-size:.88rem;color:var(--purple);background:var(--bg);outline:none;cursor:pointer}
+.g-item select:focus{border-color:var(--purple)}
+.guided-fb,.eval-fb{font-weight:800;font-size:.9rem;margin:.6rem 0;padding:.7rem 1rem;border-radius:var(--r-sm);display:none}
+.guided-fb.ok-fb,.eval-fb.ok-fb{display:block;background:rgba(6,214,160,.12);color:#059a73}
+.guided-fb.err-fb,.eval-fb.err-fb{display:block;background:rgba(255,87,87,.1);color:var(--red)}
+
+.eval-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem}
+.e-item{background:var(--card);border-radius:var(--r-sm);padding:1rem 1.2rem;box-shadow:var(--shadow)}
+.e-item p{font-weight:700;margin-bottom:.6rem;font-size:.92rem}
+.e-item label{display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.25rem 0;font-size:.9rem;font-weight:500}
+.e-item input[type=radio]{accent-color:var(--purple);width:15px;height:15px}
+
+.eval-result{text-align:center;padding:1.5rem;background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);margin-top:1rem}
+.eval-result .big-icon{font-size:3.5rem;display:block;margin-bottom:.5rem}
+.eval-result h4{font-family:var(--font-h);font-size:1.4rem;color:var(--ink)}
+
+/* =========================================
+   ██ RANKING
+   ========================================= */
+.rank-wrap{max-width:620px;margin:0 auto}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:.75rem;margin-bottom:1.5rem;min-height:155px}
+.p-place{flex:1;max-width:165px;border-radius:16px 16px 0 0;padding:1rem .5rem;text-align:center;color:#fff;font-weight:800}
+.p-gold{background:linear-gradient(180deg,#ffd700,#ffc107);height:155px}
+.p-silver{background:linear-gradient(180deg,#c0c0c0,#9e9e9e);height:120px}
+.p-bronze{background:linear-gradient(180deg,#cd7f32,#a0522d);height:90px}
+.p-medal{font-size:1.7rem}
+.p-name{font-size:.83rem;margin:.3rem 0;word-break:break-word;font-weight:800}
+.p-pts{font-size:1rem;font-weight:900}
+
+.rank-list-wrap{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.rank-row{display:flex;align-items:center;padding:.8rem 1.1rem;border-bottom:1px solid var(--border);gap:.85rem;transition:.2s}
+.rank-row:last-child{border-bottom:none}
+.rank-row:hover{background:var(--bg)}
+.rank-row.me{background:rgba(92,53,212,.05)}
+.rk-num{width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:800;color:var(--muted);flex-shrink:0}
+.rk-name{flex:1;font-weight:700;font-size:.92rem}
+.rk-level{font-size:.75rem;background:var(--bg);color:var(--muted);border-radius:20px;padding:.15rem .55rem;font-weight:700}
+.rk-score{color:var(--purple);font-weight:900;font-size:.95rem}
+.rank-empty{text-align:center;padding:2.5rem;color:var(--muted)}
+
+/* =========================================
+   ██ MUSIC BTN
+   ========================================= */
+.music-fab{position:fixed;bottom:1.2rem;right:1.2rem;z-index:300;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple-l));border:none;color:#fff;font-size:1.2rem;display:none;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(92,53,212,.45);cursor:pointer;transition:.25s}
+.music-fab.visible{display:flex}
+.music-fab:hover{transform:scale(1.12)}
+
+/* Botón docente flotante — siempre visible excepto cuando ya está en el panel */
+.teacher-fab{
+  position:fixed;bottom:1.2rem;left:1.2rem;z-index:9998;
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+  background:rgba(26,26,78,.85);backdrop-filter:blur(10px);
+  border:1.5px solid rgba(255,255,255,.15);
+  color:rgba(255,255,255,.7);border-radius:30px;
+  padding:.5rem 1rem;font-size:.8rem;font-weight:700;
+  font-family:var(--font-b);cursor:pointer;transition:.25s;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+.teacher-fab:hover{background:rgba(92,53,212,.7);color:#fff;border-color:var(--purple-l)}
+.teacher-fab.hidden{display:none!important}
+
+/* =========================================
+   ██ RESPONSIVE
+   ========================================= */
+@media(max-width:620px){
+  .module-grid{grid-template-columns:1fr 1fr}
+  .k-opts{grid-template-columns:1fr}
+  .banner-illustrations{display:none}
+  .ex-grid{grid-template-columns:1fr}
+}
+@media(max-width:380px){
+  .module-grid{grid-template-columns:1fr}
+  .topbar-r .student-chip .s-name{display:none}
+}
+/* Scrollbar */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--purple-l);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- =========================================================
+     ██ LOGIN SCREEN
+     ========================================================= -->
+<div id="screen-login" class="screen active">
+  <div class="stars" id="stars"></div>
+  <div class="login-wrap">
+
+    <!-- HERO -->
+    <div class="login-hero">
+      <span class="login-emoji-ring">🌟</span>
+      <h1 class="login-title">Let's Learn<br>To Be!</h1>
+      <p class="login-sub">Tu aula virtual de inglés · Grados 6°–8°</p>
+    </div>
+
+    <!-- ── HELP BUTTONS ── -->
+    <div class="help-btns">
+      <button class="help-btn help-student" onclick="openManual('student')">
+        📖 Manual Estudiante
+      </button>
+      <button class="help-btn help-teacher-m" onclick="openManual('teacher')">
+        📋 Manual Docente
+      </button>
+    </div>
+
+    <!-- ── SELECTOR DE ROL ── -->
+    <div class="role-selector" id="role-selector">
+      <button class="role-btn role-student" onclick="showPanel('student')">
+        <span class="role-icon">🎓</span>
+        <span class="role-label">Soy estudiante</span>
+        <span class="role-sub">Solo escribe tu nombre</span>
+      </button>
+      <button class="role-btn role-teacher" onclick="showPanel('teacher')">
+        <span class="role-icon">👨‍🏫</span>
+        <span class="role-label">Soy docente</span>
+        <span class="role-sub">Usuario y contraseña</span>
+      </button>
+    </div>
+
+    <!-- ── PANEL ESTUDIANTE ── -->
+    <div class="login-card" id="panel-student" style="display:none">
+      <button class="back-btn" onclick="showPanel('selector')">← Volver</button>
+      <p class="panel-title">🎓 Acceso Estudiante</p>
+      <div class="field">
+        <label>👋 ¿Cómo te llamas?</label>
+        <input id="inp-name" type="text" placeholder="Escribe tu nombre aquí..." maxlength="30" autocomplete="off"/>
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="loginStudent()">
+        🚀 ¡Comenzar Aventura!
+      </button>
+      <p style="text-align:center;font-size:.78rem;color:rgba(255,255,255,.4);margin-top:.75rem">🔒 El contenido se desbloquea al identificarte</p>
+    </div>
+
+    <!-- ── PANEL DOCENTE ── -->
+    <div class="login-card" id="panel-teacher" style="display:none">
+      <button class="back-btn" onclick="showPanel('selector')">← Volver</button>
+      <p class="panel-title">👨‍🏫 Acceso Docente</p>
+      <div class="field">
+        <label>Usuario</label>
+        <input id="t-user-inline" type="text" placeholder="Nombre de usuario" autocomplete="off"/>
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <div style="position:relative">
+          <input id="t-pass-inline" type="password" placeholder="Contraseña" autocomplete="off" style="padding-right:3rem;width:100%"/>
+          <button type="button" onclick="togglePassVisibility()" id="btn-toggle-pass"
+            style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);
+            background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--muted);
+            display:flex;align-items:center;justify-content:center;padding:0;line-height:1"
+            title="Mostrar/ocultar contraseña">
+            👁️
+          </button>
+        </div>
+      </div>
+      <p id="t-err-inline" style="color:#ff5757;font-size:.83rem;font-weight:700;display:none;margin-bottom:.5rem">❌ Usuario o contraseña incorrectos.</p>
+      <button class="btn btn-primary btn-full btn-lg" onclick="loginTeacherInline()">
+        🔓 Ingresar al Panel
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Teacher modal removed — login now inline -->
+
+<!-- =========================================================
+     ██ TEACHER DASHBOARD
+     ========================================================= -->
+<div id="screen-teacher" class="screen">
+  <div class="teacher-topbar">
+    <div class="teacher-topbar-l">
+      <span>👨‍🏫</span>
+      <span class="t-logo">Panel Docente — Let's Learn To Be!</span>
+    </div>
+    <div class="teacher-topbar-r">
+      <button class="btn btn-secondary" style="padding:.4rem 1rem;font-size:.82rem" onclick="exportCSV()">📥 Exportar CSV</button>
+      <button class="btn btn-danger" style="padding:.4rem 1rem;font-size:.82rem" onclick="logoutTeacher()">Salir</button>
+    </div>
+  </div>
+
+  <div class="teacher-hero">
+    <h2>📊 Dashboard de Resultados</h2>
+    <p>Resultados almacenados en este dispositivo</p>
+  </div>
+
+  <div class="stats-grid" id="t-stats-grid">
+    <!-- generated by JS -->
+  </div>
+
+  <div class="teacher-table-wrap">
+    <table class="teacher-table" id="t-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Estudiante</th><th>Puntaje</th><th>Nivel</th><th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody id="t-tbody"></tbody>
+    </table>
+    <div id="t-empty" class="teacher-empty" style="display:none">
+      📋 Aún no hay resultados registrados.
+    </div>
+  </div>
+
+  <div class="teacher-actions">
+    <button class="btn btn-danger" onclick="resetAllData()">🗑️ Reiniciar todos los datos</button>
+    <button class="btn btn-yellow" onclick="refreshTeacher()">🔄 Actualizar tabla</button>
+  </div>
+
+  <div class="app-footer" style="margin-top:2rem;border-radius:var(--r)">
+    <strong>Grupo IEV-96</strong> · Maestría en Recursos Digitales · Universidad de Cartagena
+  </div>
+</div>
+
+<!-- =========================================================
+     ██ MAIN APP
+     ========================================================= -->
+<div id="screen-app" class="screen">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-l">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="t-brand">Let's Learn To Be!</span>
+    </div>
+    <div class="topbar-r">
+      <div class="student-chip">
+        <span>👤</span>
+        <span class="s-name" id="chip-name">...</span>
+      </div>
+      <div class="score-chip">⭐ <span id="chip-score">0</span></div>
+      <button class="btn-exit" onclick="logoutStudent()">Salir</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <span class="sb-brand">🌟 Let's Learn!</span>
+      <button class="sb-close" onclick="toggleSidebar()">✕</button>
+    </div>
+    <div class="nav-items">
+      <button class="nav-a active" data-sec="home" onclick="showSec('home')"><div class="nav-icon-wrap">🏠</div> Inicio</button>
+      <button class="nav-a" data-sec="learn" onclick="showSec('learn')"><div class="nav-icon-wrap">📚</div> Aprende</button>
+      <button class="nav-a" data-sec="practice" onclick="showSec('practice')"><div class="nav-icon-wrap">✏️</div> Práctica Adaptativa</button>
+      <button class="nav-a" data-sec="drag" onclick="showSec('drag')"><div class="nav-icon-wrap">🎯</div> Drag & Drop</button>
+      <button class="nav-a" data-sec="kahoot" onclick="showSec('kahoot')"><div class="nav-icon-wrap">⚡</div> Juego Kahoot</button>
+      <button class="nav-a" data-sec="classroom" onclick="showSec('classroom')"><div class="nav-icon-wrap">🏫</div> Aula Virtual</button>
+      <button class="nav-a" data-sec="ranking" onclick="showSec('ranking')"><div class="nav-icon-wrap">🏆</div> Ranking</button>
+    </div>
+    <div class="sb-progress">
+      <p class="sb-progress-label">Tu Progreso General</p>
+      <div class="sb-bar-wrap"><div class="sb-bar-fill" id="sb-bar"></div></div>
+      <p class="sb-level-text" id="sb-level-txt">Nivel 1 · Principiante</p>
+    </div>
+  </nav>
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── HOME ── -->
+    <div class="sec active" id="sec-home">
+      <div class="home-banner">
+        <div class="banner-content">
+          <p class="banner-greeting">Bienvenido/a de vuelta</p>
+          <h2 class="banner-name" id="ban-name">Estudiante</h2>
+          <div class="banner-meta">
+            <span class="banner-level">⚡ Nivel <span id="ban-level">1</span> · <span id="ban-level-name">Principiante</span></span>
+            <span class="banner-points">⭐ <span id="ban-pts">0</span> puntos</span>
+          </div>
+          <button class="banner-cta" onclick="showSec('learn')">📚 Comenzar a aprender →</button>
+        </div>
+        <div class="banner-illustrations">🎓<br>📖<br>✨</div>
+      </div>
+
+      <div class="module-grid">
+        <div class="mod-card c1" onclick="showSec('learn')">
+          <div class="mod-icon-wrap ic-purple">📚</div>
+          <h3>Aprende</h3>
+          <p>Teoría completa del verbo To Be con ejemplos y situaciones</p>
+          <span class="mod-tag tag-purple">Teoría</span>
+        </div>
+        <div class="mod-card c2" onclick="showSec('practice')">
+          <div class="mod-icon-wrap ic-cyan">✏️</div>
+          <h3>Práctica Adaptativa</h3>
+          <p>Quiz que se ajusta automáticamente a tu nivel</p>
+          <span class="mod-tag tag-cyan">Quiz</span>
+        </div>
+        <div class="mod-card c3" onclick="showSec('drag')">
+          <div class="mod-icon-wrap ic-pink">🎯</div>
+          <h3>Drag & Drop</h3>
+          <p>Arrastra la respuesta correcta al lugar indicado</p>
+          <span class="mod-tag tag-pink">Actividad</span>
+        </div>
+        <div class="mod-card c4 featured" onclick="showSec('kahoot')">
+          <div class="mod-icon-wrap ic-green">⚡</div>
+          <h3>Juego Kahoot</h3>
+          <p>¡Responde rápido y gana más puntos! Desafío de velocidad</p>
+          <span class="mod-tag tag-hot">¡Caliente!</span>
+        </div>
+        <div class="mod-card c5" onclick="showSec('classroom')">
+          <div class="mod-icon-wrap ic-yellow">🏫</div>
+          <h3>Aula Virtual</h3>
+          <p>Secuencia completa: explorar → practicar → evaluar</p>
+          <span class="mod-tag tag-yellow">Clase</span>
+        </div>
+        <div class="mod-card c6" onclick="showSec('ranking')">
+          <div class="mod-icon-wrap ic-red">🏆</div>
+          <h3>Ranking</h3>
+          <p>Compara tu puntaje con el de otros estudiantes</p>
+          <span class="mod-tag tag-purple">Trofeos</span>
+        </div>
+      </div>
+
+      <div class="mot-strip">
+        <span class="mot-emoji">💪</span>
+        <span id="mot-text">¡Cada ejercicio te acerca más al dominio del inglés!</span>
+      </div>
+    </div>
+
+    <!-- ── LEARN ── -->
+    <div class="sec" id="sec-learn">
+      <div class="sec-head">
+        <h2>📚 Aprende: El Verbo <em style="font-style:normal;color:var(--purple)">To Be</em></h2>
+        <p>Domina am, is y are con ejemplos de situaciones reales</p>
+      </div>
+
+      <div class="tab-row">
+        <button class="t-btn active" onclick="showTab('t-intro')">¿Qué es?</button>
+        <button class="t-btn" onclick="showTab('t-forms')">Formas</button>
+        <button class="t-btn" onclick="showTab('t-examples')">Ejemplos</button>
+        <button class="t-btn" onclick="showTab('t-situations')">Situaciones</button>
+        <button class="t-btn" onclick="showTab('t-neg')">Negativo</button>
+        <button class="t-btn" onclick="showTab('t-quest')">Preguntas</button>
+      </div>
+
+      <div class="tcontent active" id="t-intro">
+        <div class="theory-block">
+          <h3>🔵 ¿Qué es el verbo <em style="font-style:normal">To Be</em>?</h3>
+          <p style="line-height:1.8;margin-bottom:.75rem">El verbo <strong>"to be"</strong> significa <strong>"ser" o "estar"</strong> en español. Es el verbo más importante del inglés y lo usamos para:</p>
+          <div class="situation-cards">
+            <div class="sit-card"><span class="sit-emoji">🎓</span><div class="sit-sentence">I <em>am</em> a student.</div><div class="sit-trans">Yo soy un/a estudiante.</div></div>
+            <div class="sit-card"><span class="sit-emoji">😊</span><div class="sit-sentence">She <em>is</em> happy.</div><div class="sit-trans">Ella está feliz.</div></div>
+            <div class="sit-card"><span class="sit-emoji">🏫</span><div class="sit-sentence">We <em>are</em> at school.</div><div class="sit-trans">Estamos en la escuela.</div></div>
+            <div class="sit-card"><span class="sit-emoji">🇨🇴</span><div class="sit-sentence">They <em>are</em> Colombian.</div><div class="sit-trans">Ellos son colombianos.</div></div>
+            <div class="sit-card"><span class="sit-emoji">🎂</span><div class="sit-sentence">He <em>is</em> 13 years old.</div><div class="sit-trans">Él tiene 13 años.</div></div>
+            <div class="sit-card"><span class="sit-emoji">🐕</span><div class="sit-sentence">It <em>is</em> a dog.</div><div class="sit-trans">Es un perro.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tcontent" id="t-forms">
+        <div class="theory-block">
+          <h3>📊 Formas del verbo To Be</h3>
+          <table class="pr-table">
+            <thead><tr><th>Pronombre</th><th>Verbo</th><th>Contracción</th><th>Español</th></tr></thead>
+            <tbody>
+              <tr class="am-row"><td>I</td><td>am</td><td>I'm</td><td>Yo soy/estoy</td></tr>
+              <tr class="is-row"><td>He</td><td>is</td><td>He's</td><td>Él es/está</td></tr>
+              <tr class="is-row"><td>She</td><td>is</td><td>She's</td><td>Ella es/está</td></tr>
+              <tr class="is-row"><td>It</td><td>is</td><td>It's</td><td>Es/está</td></tr>
+              <tr class="are-row"><td>You</td><td>are</td><td>You're</td><td>Tú eres/estás</td></tr>
+              <tr class="are-row"><td>We</td><td>are</td><td>We're</td><td>Nosotros somos/estamos</td></tr>
+              <tr class="are-row"><td>They</td><td>are</td><td>They're</td><td>Ellos son/están</td></tr>
+            </tbody>
+          </table>
+          <div class="tip-bar">💡 Truco: <strong>I → AM</strong> · <strong>He / She / It → IS</strong> · <strong>You / We / They → ARE</strong></div>
+        </div>
+      </div>
+
+      <div class="tcontent" id="t-examples">
+        <div class="theory-block">
+          <h3>💬 Ejemplos en contexto</h3>
+          <div class="ex-grid">
+            <div class="ex-card ex-am">
+              <span class="ex-pron">Con I</span>
+              <div class="ex-verb">am</div>
+              <div class="ex-lines">
+                <p>I <strong>am</strong> a student.</p>
+                <p>I <strong>am</strong> 13 years old.</p>
+                <p>I <strong>am</strong> from Cartagena.</p>
+              </div>
+            </div>
+            <div class="ex-card ex-is">
+              <span class="ex-pron">Con He / She / It</span>
+              <div class="ex-verb">is</div>
+              <div class="ex-lines">
+                <p>She <strong>is</strong> my teacher.</p>
+                <p>He <strong>is</strong> tall and smart.</p>
+                <p>It <strong>is</strong> a sunny day.</p>
+              </div>
+            </div>
+            <div class="ex-card ex-are">
+              <span class="ex-pron">Con You / We / They</span>
+              <div class="ex-verb">are</div>
+              <div class="ex-lines">
+                <p>We <strong>are</strong> friends.</p>
+                <p>They <strong>are</strong> happy today.</p>
+                <p>You <strong>are</strong> very smart!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tcontent" id="t-situations">
+        <div class="theory-block">
+          <h3>🌎 Situaciones cotidianas</h3>
+          <p style="margin-bottom:1rem;line-height:1.7">Así usamos el verbo To Be en situaciones de tu vida diaria:</p>
+          <div class="situation-cards">
+            <div class="sit-card"><span class="sit-emoji">😴</span><div class="sit-sentence">I <em>am</em> tired.</div><div class="sit-trans">Estoy cansado/a.</div></div>
+            <div class="sit-card"><span class="sit-emoji">🏠</span><div class="sit-sentence">She <em>is</em> at home.</div><div class="sit-trans">Ella está en casa.</div></div>
+            <div class="sit-card"><span class="sit-emoji">🌧️</span><div class="sit-sentence">It <em>is</em> raining.</div><div class="sit-trans">Está lloviendo.</div></div>
+            <div class="sit-card"><span class="sit-emoji">📱</span><div class="sit-sentence">We <em>are</em> ready.</div><div class="sit-trans">Estamos listos.</div></div>
+            <div class="sit-card"><span class="sit-emoji">😂</span><div class="sit-sentence">They <em>are</em> funny!</div><div class="sit-trans">¡Son chistosos!</div></div>
+            <div class="sit-card"><span class="sit-emoji">🧠</span><div class="sit-sentence">He <em>is</em> clever.</div><div class="sit-trans">Él es inteligente.</div></div>
+            <div class="sit-card"><span class="sit-emoji">🌟</span><div class="sit-sentence">You <em>are</em> amazing!</div><div class="sit-trans">¡Eres increíble!</div></div>
+            <div class="sit-card"><span class="sit-emoji">🎵</span><div class="sit-sentence">I <em>am</em> a singer.</div><div class="sit-trans">Yo soy cantante.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tcontent" id="t-neg">
+        <div class="theory-block">
+          <h3>❌ Forma Negativa</h3>
+          <p style="margin-bottom:.75rem;line-height:1.7">Agrega <strong>not</strong> después del verbo To Be para hacer oraciones negativas:</p>
+          <div class="neg-list">
+            <div class="neg-item"><span class="neg-from">I am happy.</span><span class="arr">→</span><span class="neg-to">I <strong>am not</strong> happy. / I<strong>'m not</strong> happy.</span></div>
+            <div class="neg-item"><span class="neg-from">She is here.</span><span class="arr">→</span><span class="neg-to">She <strong>is not</strong> here. / She <strong>isn't</strong> here.</span></div>
+            <div class="neg-item"><span class="neg-from">They are ready.</span><span class="arr">→</span><span class="neg-to">They <strong>are not</strong> ready. / They <strong>aren't</strong> ready.</span></div>
+            <div class="neg-item"><span class="neg-from">He is a teacher.</span><span class="arr">→</span><span class="neg-to">He <strong>is not</strong> a teacher. / He <strong>isn't</strong> a teacher.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tcontent" id="t-quest">
+        <div class="theory-block">
+          <h3>❓ Preguntas con To Be</h3>
+          <p style="margin-bottom:.75rem;line-height:1.7">Para preguntar, <strong>invierte el sujeto y el verbo</strong>:</p>
+          <div class="q-list">
+            <div class="q-item"><span class="q-from">She is a doctor.</span><span class="arr">→</span><span class="q-to"><strong>Is</strong> she a doctor?</span></div>
+            <div class="q-item"><span class="q-from">You are Colombian.</span><span class="arr">→</span><span class="q-to"><strong>Are</strong> you Colombian?</span></div>
+            <div class="q-item"><span class="q-from">I am late.</span><span class="arr">→</span><span class="q-to"><strong>Am</strong> I late?</span></div>
+            <div class="q-item"><span class="q-from">They are ready.</span><span class="arr">→</span><span class="q-to"><strong>Are</strong> they ready?</span></div>
+          </div>
+          <div class="tip-bar" style="margin-top:1rem">💡 Respuestas cortas: "Yes, she <strong>is</strong>." · "No, they <strong>aren't</strong>." · "Yes, I <strong>am</strong>."</div>
+        </div>
+      </div>
+
+      <div class="learn-cta">
+        <p>¿Listo para practicar? 💪</p>
+        <button class="btn btn-primary btn-lg" onclick="showSec('practice')">✏️ Ir a Práctica Adaptativa →</button>
+      </div>
+    </div>
+
+    <!-- ── PRACTICE ── -->
+    <div class="sec" id="sec-practice">
+      <div class="sec-head">
+        <h2>✏️ Práctica Adaptativa</h2>
+        <p>El sistema ajusta la dificultad según tus respuestas</p>
+      </div>
+      <div class="practice-wrap">
+        <div class="practice-meta">
+          <span class="lvl-badge" id="prac-lvl-badge">Nivel 1</span>
+          <span class="prac-score">Puntos sesión: <strong id="prac-ses-score">0</strong></span>
+          <span class="prac-counter" id="prac-counter">Pregunta 1/10</span>
+        </div>
+        <div class="q-card" id="prac-q-card">
+          <div class="q-illustration" id="prac-illus">🤔</div>
+          <div class="q-text" id="prac-q-text">Cargando...</div>
+          <div class="opt-grid" id="prac-opts"></div>
+          <div class="fb-box" id="prac-fb"></div>
+        </div>
+        <div class="prac-done" id="prac-done" style="display:none">
+          <div class="big-icon">🎓</div>
+          <h3>¡Práctica completada!</h3>
+          <p>Obtuviste <strong id="prac-final-pts">0</strong> puntos en esta sesión.</p>
+          <p id="prac-final-msg" style="margin-top:.4rem;font-size:.9rem;color:var(--muted)"></p>
+          <div class="prac-done-btns">
+            <button class="btn btn-primary" onclick="resetPractice()">🔄 Repetir</button>
+            <button class="btn btn-green" onclick="showSec('drag')">Siguiente →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DRAG & DROP ── -->
+    <div class="sec" id="sec-drag">
+      <div class="sec-head">
+        <h2>🎯 Drag & Drop</h2>
+        <p>Elige la forma correcta del verbo To Be y completa la oración</p>
+      </div>
+      <div class="drag-wrap">
+        <div class="drag-top">
+          <span>✅ Aciertos: <strong id="drag-score">0</strong></span>
+          <span>Ejercicio: <strong id="drag-ctr">1</strong> / 8</span>
+        </div>
+        <div class="drag-area" id="drag-area">
+          <div class="drag-scene" id="drag-scene">🌟</div>
+          <div class="drag-sentence" id="drag-sentence">Cargando...</div>
+          <div class="drag-hint" id="drag-hint"></div>
+        </div>
+        <div class="drag-opts" id="drag-opts"></div>
+        <div class="drag-fb" id="drag-fb"></div>
+        <div class="drag-nav">
+          <button class="btn btn-secondary" id="btn-drag-next" style="display:none" onclick="nextDrag()">Siguiente →</button>
+        </div>
+        <div class="drag-done" id="drag-done" style="display:none">
+          <div class="big-icon">🎯</div>
+          <h3 style="font-family:var(--font-h);font-size:1.6rem;color:var(--ink)">¡Drag & Drop completado!</h3>
+          <p style="color:var(--muted);margin:.4rem 0">Aciertos: <strong id="drag-final">0</strong> de 8</p>
+          <div class="prac-done-btns">
+            <button class="btn btn-primary" onclick="resetDrag()">🔄 Repetir</button>
+            <button class="btn btn-green" onclick="showSec('kahoot')">⚡ Al Kahoot!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── KAHOOT ── -->
+    <div class="sec" id="sec-kahoot">
+      <div class="sec-head">
+        <h2>⚡ Juego Tipo Kahoot</h2>
+        <p>Responde rápido para ganar más puntos</p>
+      </div>
+      <div id="k-lobby" class="kahoot-lobby">
+        <span class="kahoot-hero-icon">⚡</span>
+        <h3>¿Estás listo para el desafío?</h3>
+        <p>10 preguntas · 15 segundos · Más velocidad = más puntos</p>
+        <button class="btn btn-primary btn-lg" onclick="startKahoot()">🎮 ¡JUGAR AHORA!</button>
+      </div>
+      <div id="k-game" class="kahoot-game-area" style="display:none">
+        <div class="k-header">
+          <div class="k-timer">
+            <svg viewBox="0 0 68 68"><circle class="t-bg" cx="34" cy="34" r="30"/><circle class="t-fill" id="k-circle" cx="34" cy="34" r="30"/></svg>
+            <span class="t-num" id="k-time-num">15</span>
+          </div>
+          <div class="k-meta">
+            <div>Pregunta <strong id="k-q-num">1</strong>/10</div>
+            <div>⭐ <strong id="k-pts">0</strong> pts</div>
+          </div>
+        </div>
+        <div class="k-q" id="k-q-text">Pregunta...</div>
+        <div class="k-opts" id="k-opts"></div>
+        <div class="k-fb" id="k-fb"></div>
+      </div>
+      <div id="k-end" class="kahoot-end" style="display:none">
+        <span class="end-trophy">🏆</span>
+        <h3>¡Juego Terminado!</h3>
+        <p>Puntaje final: <strong id="k-final-pts">0</strong> puntos</p>
+        <p id="k-rank-msg" style="color:rgba(255,255,255,.6)"></p>
+        <div class="kahoot-end-btns">
+          <button class="btn btn-primary" onclick="restartKahoot()">🔄 Jugar de nuevo</button>
+          <button class="btn btn-secondary" onclick="showSec('ranking')">🏆 Ver Ranking</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CLASSROOM ── -->
+    <div class="sec" id="sec-classroom">
+      <div class="sec-head">
+        <h2>🏫 Aula Virtual</h2>
+        <p>Secuencia didáctica: Explorar → Practicar → Evaluar</p>
+      </div>
+      <div class="steps-indicator">
+        <div class="st-dot active" id="sd1">1</div>
+        <div class="st-line" id="sl1"></div>
+        <div class="st-dot" id="sd2">2</div>
+        <div class="st-line" id="sl2"></div>
+        <div class="st-dot" id="sd3">3</div>
+      </div>
+
+      <div class="cl-step active" id="cl-step-1">
+        <h3>📖 Paso 1: Exploración</h3>
+        <div class="video-wrap">
+          <div class="video-label">
+            <span>🎬</span>
+            <span>The Verb To Be – A Complete Introduction</span>
+          </div>
+
+          <!-- ── Reproductor: lee tobe.mp4 desde la misma carpeta que index.html ── -->
+          <video id="lesson-video" controls>
+            <source src="tobe.mp4" type="video/mp4"/>
+            Tu navegador no soporta el elemento video.
+          </video>
+
+          <!-- ── Aviso si el archivo no se encuentra ── -->
+          <div class="video-missing" id="video-missing" style="display:none">
+            <span class="video-empty-icon">⚠️</span>
+            <p class="video-empty-title">Archivo no encontrado</p>
+            <p class="video-empty-sub">Asegúrate de que el archivo <strong>tobe.mp4</strong> esté en la misma carpeta que <strong>index.html</strong></p>
+          </div>
+        </div>
+        <div class="rule-showcase">
+          <h4>🥇 La Regla de Oro del Verbo To Be</h4>
+          <div class="rule-row">
+            <div class="rule-pill rp-am"><span class="rp-pro">Pronombre</span><div class="rp-verb">AM</div><strong>I</strong></div>
+            <div class="rule-pill rp-is"><span class="rp-pro">Pronombres</span><div class="rp-verb">IS</div><strong>He · She · It</strong></div>
+            <div class="rule-pill rp-are"><span class="rp-pro">Pronombres</span><div class="rp-verb">ARE</div><strong>You · We · They</strong></div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="clStep(2)">Siguiente: Práctica Guiada →</button>
+      </div>
+
+      <div class="cl-step" id="cl-step-2">
+        <h3>✏️ Paso 2: Práctica Guiada</h3>
+        <div class="guided-list" id="guided-list"></div>
+        <div class="guided-fb" id="guided-fb"></div>
+        <button class="btn btn-primary" onclick="checkGuided()">✅ Verificar respuestas</button>
+      </div>
+
+      <div class="cl-step" id="cl-step-3">
+        <h3>📝 Paso 3: Evaluación Final</h3>
+        <div class="eval-list" id="eval-list"></div>
+        <div class="eval-fb" id="eval-fb"></div>
+        <button class="btn btn-primary" id="btn-eval" onclick="submitEval()">📤 Enviar evaluación</button>
+        <div class="eval-result" id="eval-result" style="display:none">
+          <span class="big-icon">🎓</span>
+          <h4>¡Secuencia completada!</h4>
+          <p style="margin:.4rem 0;color:var(--muted)">Resultado: <strong id="eval-score">0</strong>/5 correctas</p>
+          <p id="eval-msg" style="font-size:.88rem;color:var(--muted)"></p>
+          <button class="btn btn-secondary" style="margin-top:1rem" onclick="restartClassroom()">🔄 Repetir secuencia</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RANKING ── -->
+    <div class="sec" id="sec-ranking">
+      <div class="sec-head">
+        <h2>🏆 Ranking de Estudiantes</h2>
+        <p>Los mejores aprendices del verbo To Be</p>
+      </div>
+      <div class="rank-wrap">
+        <div class="podium" id="podium"></div>
+        <div class="rank-list-wrap" id="rank-list"></div>
+      </div>
+    </div>
+
+  </main><!-- /main -->
+
+  <footer class="app-footer">
+    🌟 Let's Learn To Be! &nbsp;·&nbsp; <strong>Grupo IEV-96</strong> &nbsp;·&nbsp; Maestría en Recursos Digitales &nbsp;·&nbsp; Universidad de Cartagena
+  </footer>
+</div><!-- /screen-app -->
+
+<!-- Music FAB -->
+<button class="music-fab" id="music-fab" onclick="toggleMusic()" title="Música de fondo">🎵</button>
+
+<!-- Teacher Access FAB — visible solo en login y app, no en panel docente -->
+<button class="teacher-fab" id="teacher-fab" onclick="openTeacherModal()" title="Acceso docente">
+  👨‍🏫
+</button>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     MANUAL ESTUDIANTE
+     ══════════════════════════════════════════ -->
+<div id="manual-student" class="manual-overlay" style="display:none">
+  <div class="manual-box">
+    <div class="manual-header mh-student">
+      <div class="manual-header-text">
+        <span class="manual-icon">🎓</span>
+        <div>
+          <h2 class="manual-title">Manual de Uso — Estudiante</h2>
+          <p class="manual-sub">Let's Learn To Be! · Grupo IEV-96</p>
+        </div>
+      </div>
+      <button class="manual-close" onclick="closeManual('student')">✕</button>
+    </div>
+    <div class="manual-body">
+
+      <!-- INTRO -->
+      <div class="manual-section">
+        <h3 class="msec-title">🌟 ¿Qué es Let's Learn To Be?</h3>
+        <p class="msec-text">Es tu aula virtual de inglés diseñada especialmente para estudiantes de grados 6° a 8°. Aquí aprenderás a usar el verbo <strong>To Be</strong> (am, is, are) de forma divertida e interactiva a través de juegos, actividades y ejercicios con puntos.</p>
+        <div class="manual-highlight">
+          <span class="mh-icon">💡</span>
+          <span>Regla de oro: <strong>I → AM</strong> · <strong>He / She / It → IS</strong> · <strong>You / We / They → ARE</strong></span>
+        </div>
+      </div>
+
+      <!-- ACCESO -->
+      <div class="manual-section">
+        <h3 class="msec-title">🚀 ¿Cómo ingresar?</h3>
+        <div class="manual-steps">
+          <div class="mstep"><div class="mstep-num">1</div><div class="mstep-text">En la pantalla de inicio haz clic en el botón <strong>"🎓 Soy estudiante"</strong>.</div></div>
+          <div class="mstep"><div class="mstep-num">2</div><div class="mstep-text">Escribe tu <strong>nombre completo</strong> en el campo de texto.</div></div>
+          <div class="mstep"><div class="mstep-num">3</div><div class="mstep-text">Haz clic en <strong>"🚀 ¡Comenzar Aventura!"</strong> o presiona <strong>Enter</strong>.</div></div>
+          <div class="mstep"><div class="mstep-num">4</div><div class="mstep-text">¡Listo! Ya puedes acceder a todas las actividades. Tu puntaje se guarda automáticamente.</div></div>
+        </div>
+        <div class="manual-tip">💾 Si ya ingresaste antes con el mismo nombre, el sistema recuperará tu puntaje anterior.</div>
+      </div>
+
+      <!-- SECCIONES -->
+      <div class="manual-section">
+        <h3 class="msec-title">📚 Secciones del portal</h3>
+        <div class="manual-cards">
+          <div class="mcard"><div class="mcard-icon">📚</div><div class="mcard-body"><strong>Aprende</strong><p>Teoría del verbo To Be organizada en 6 pestañas: definición, formas, ejemplos, situaciones cotidianas, negativo y preguntas.</p></div></div>
+          <div class="mcard"><div class="mcard-icon">✏️</div><div class="mcard-body"><strong>Práctica Adaptativa</strong><p>Quiz de 10 preguntas que sube o baja la dificultad automáticamente según tus respuestas. Recibes retroalimentación inmediata.</p></div></div>
+          <div class="mcard"><div class="mcard-icon">🎯</div><div class="mcard-body"><strong>Drag & Drop</strong><p>Elige la forma correcta (am, is, are) y completa 8 oraciones. Toca la respuesta para colocarla en el espacio en blanco.</p></div></div>
+          <div class="mcard"><div class="mcard-icon">⚡</div><div class="mcard-body"><strong>Juego Kahoot</strong><p>10 preguntas con 15 segundos cada una. ¡Responde rápido para ganar más puntos! Hay bonificación por velocidad.</p></div></div>
+          <div class="mcard"><div class="mcard-icon">🏫</div><div class="mcard-body"><strong>Aula Virtual</strong><p>Secuencia de 3 pasos: 1) Ver el video explicativo, 2) Práctica guiada con menús, 3) Evaluación final con 5 preguntas.</p></div></div>
+          <div class="mcard"><div class="mcard-icon">🏆</div><div class="mcard-body"><strong>Ranking</strong><p>Tabla con todos los estudiantes ordenada por puntaje. Los tres mejores aparecen en el podio con medallas 🥇🥈🥉.</p></div></div>
+        </div>
+      </div>
+
+      <!-- PUNTOS -->
+      <div class="manual-section">
+        <h3 class="msec-title">⭐ Sistema de puntos y niveles</h3>
+        <div class="manual-table-wrap">
+          <table class="manual-table">
+            <thead><tr><th>Actividad</th><th>Puntos</th></tr></thead>
+            <tbody>
+              <tr><td>Práctica nivel fácil</td><td>10 pts / pregunta</td></tr>
+              <tr><td>Práctica nivel medio</td><td>20 pts / pregunta</td></tr>
+              <tr><td>Práctica nivel difícil</td><td>30 pts / pregunta</td></tr>
+              <tr><td>Drag & Drop (acierto)</td><td>15 pts / ejercicio</td></tr>
+              <tr><td>Kahoot (respuesta correcta)</td><td>50 + bono velocidad</td></tr>
+              <tr><td>Evaluación Aula Virtual</td><td>20 pts / correcta</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="manual-levels">
+          <div class="mlevel l1">Nivel 1<br><small>Principiante<br>0–49 pts</small></div>
+          <div class="mlevel l2">Nivel 2<br><small>Básico<br>50–149 pts</small></div>
+          <div class="mlevel l3">Nivel 3<br><small>Intermedio<br>150–299 pts</small></div>
+          <div class="mlevel l4">Nivel 4<br><small>Avanzado<br>300–499 pts</small></div>
+          <div class="mlevel l5">Nivel 5<br><small>Experto<br>500+ pts</small></div>
+        </div>
+      </div>
+
+      <!-- TIPS -->
+      <div class="manual-section">
+        <h3 class="msec-title">💪 Consejos para aprender mejor</h3>
+        <div class="manual-tip-list">
+          <div class="mtip">✅ Empieza siempre por la sección <strong>Aprende</strong> antes de hacer los ejercicios.</div>
+          <div class="mtip">✅ Usa siempre el <strong>mismo nombre</strong> cada vez que ingreses para conservar tus puntos.</div>
+          <div class="mtip">✅ Si te equivocas, lee la pista que aparece — ¡te ayudará a entender el error!</div>
+          <div class="mtip">✅ En el Kahoot, la velocidad suma puntos. ¡No dejes pasar los 15 segundos!</div>
+          <div class="mtip">✅ Completa el Aula Virtual para ganar puntos extra con la evaluación final.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="manual-footer">
+      <span>🌟 Let's Learn To Be! · Grupo IEV-96 · Maestría en Recursos Digitales · Universidad de Cartagena</span>
+      <button class="btn btn-primary" onclick="closeManual('student')" style="width:auto;padding:.6rem 1.4rem">Cerrar ✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MANUAL DOCENTE
+     ══════════════════════════════════════════ -->
+<div id="manual-teacher" class="manual-overlay" style="display:none">
+  <div class="manual-box">
+    <div class="manual-header mh-teacher">
+      <div class="manual-header-text">
+        <span class="manual-icon">👨‍🏫</span>
+        <div>
+          <h2 class="manual-title">Manual de Uso — Docente</h2>
+          <p class="manual-sub">Let's Learn To Be! · Grupo IEV-96</p>
+        </div>
+      </div>
+      <button class="manual-close" onclick="closeManual('teacher')">✕</button>
+    </div>
+    <div class="manual-body">
+
+      <!-- INTRO -->
+      <div class="manual-section">
+        <h3 class="msec-title">🌟 Introducción al portal</h3>
+        <p class="msec-text"><strong>Let's Learn To Be!</strong> es una aplicación web educativa interactiva para la enseñanza del verbo <strong>To Be</strong> (am, is, are) en inglés, dirigida a estudiantes de grados 6° a 8°. El portal combina teoría, práctica adaptativa, juegos tipo Kahoot, actividades Drag & Drop y una secuencia didáctica completa en el Aula Virtual.</p>
+        <div class="manual-highlight mh-ink">
+          <span class="mh-icon">🎯</span>
+          <span>El docente tiene acceso a un <strong>panel exclusivo</strong> con el seguimiento de resultados de todos los estudiantes, completamente separado del portal de los estudiantes.</span>
+        </div>
+      </div>
+
+      <!-- ACCESO DOCENTE -->
+      <div class="manual-section">
+        <h3 class="msec-title">🔐 ¿Cómo acceder al Panel Docente?</h3>
+        <div class="manual-steps">
+          <div class="mstep mstep-t"><div class="mstep-num mn-t">1</div><div class="mstep-text">En la pantalla de inicio haz clic en <strong>"👨‍🏫 Soy docente"</strong>.</div></div>
+          <div class="mstep mstep-t"><div class="mstep-num mn-t">2</div><div class="mstep-text">Ingresa el <strong>usuario</strong> y la <strong>contraseña</strong> en los campos que aparecen.</div></div>
+          <div class="mstep mstep-t"><div class="mstep-num mn-t">3</div><div class="mstep-text">Puedes hacer clic en el ícono <strong>👁️</strong> para mostrar u ocultar la contraseña.</div></div>
+          <div class="mstep mstep-t"><div class="mstep-num mn-t">4</div><div class="mstep-text">Haz clic en <strong>"🔓 Ingresar al Panel"</strong> o presiona <strong>Enter</strong>.</div></div>
+        </div>
+
+      </div>
+
+      <!-- ACCESO ESTUDIANTE (info) -->
+      <div class="manual-section">
+        <h3 class="msec-title">🎓 ¿Cómo acceden los estudiantes?</h3>
+        <p class="msec-text">Los estudiantes <strong>no necesitan contraseña</strong>. Solo deben hacer clic en <strong>"🎓 Soy estudiante"</strong>, escribir su nombre y presionar <strong>"🚀 ¡Comenzar Aventura!"</strong>. El sistema guarda el puntaje asociado a ese nombre automáticamente.</p>
+        <div class="manual-tip">💡 Recomienda a los estudiantes usar siempre el mismo nombre y el mismo dispositivo para conservar su puntaje acumulado.</div>
+      </div>
+
+      <!-- PANEL DOCENTE -->
+      <div class="manual-section">
+        <h3 class="msec-title">📊 Panel Docente — ¿Qué contiene?</h3>
+        <div class="manual-cards">
+          <div class="mcard"><div class="mcard-icon">📈</div><div class="mcard-body"><strong>Estadísticas generales</strong><p>4 tarjetas con: total de estudiantes registrados, puntaje promedio de la clase, puntaje más alto obtenido y nombre del estudiante líder.</p></div></div>
+          <div class="mcard"><div class="mcard-icon">📋</div><div class="mcard-body"><strong>Tabla de resultados</strong><p>Lista completa de todos los estudiantes ordenada de mayor a menor puntaje. Incluye: posición (🥇🥈🥉), nombre, puntaje, nivel alcanzado y fecha de acceso.</p></div></div>
+          <div class="mcard"><div class="mcard-icon">📥</div><div class="mcard-body"><strong>Exportar CSV</strong><p>Descarga un archivo con todos los datos de la tabla, compatible con Excel y Google Sheets para análisis y registro.</p></div></div>
+          <div class="mcard"><div class="mcard-icon">🔄</div><div class="mcard-body"><strong>Actualizar tabla</strong><p>Recarga los datos más recientes sin necesidad de cerrar y volver a abrir el panel.</p></div></div>
+          <div class="mcard"><div class="mcard-icon">🗑️</div><div class="mcard-body"><strong>Reiniciar datos</strong><p>Borra todos los registros de estudiantes. Solicita confirmación antes de ejecutarse. Esta acción es irreversible.</p></div></div>
+        </div>
+      </div>
+
+      <!-- SECCIONES EDUCATIVAS -->
+      <div class="manual-section">
+        <h3 class="msec-title">🏫 Secciones pedagógicas del portal</h3>
+        <div class="manual-table-wrap">
+          <table class="manual-table">
+            <thead><tr><th>Sección</th><th>Descripción pedagógica</th></tr></thead>
+            <tbody>
+              <tr><td><strong>📚 Aprende</strong></td><td>Teoría en 6 pestañas: definición, tabla de formas, ejemplos contextualizados, situaciones cotidianas, negativo y preguntas.</td></tr>
+              <tr><td><strong>✏️ Práctica Adaptativa</strong></td><td>Quiz de 10 preguntas que ajusta la dificultad automáticamente (3 niveles). Retroalimentación inmediata con pistas.</td></tr>
+              <tr><td><strong>🎯 Drag & Drop</strong></td><td>8 ejercicios de completar oraciones arrastrando (am / is / are). Ideal para reforzar de forma lúdica.</td></tr>
+              <tr><td><strong>⚡ Kahoot</strong></td><td>10 preguntas rápidas con temporizador de 15 segundos y bonificación por velocidad. Alta motivación.</td></tr>
+              <tr><td><strong>🏫 Aula Virtual</strong></td><td>Secuencia didáctica de 3 pasos: video → práctica guiada → evaluación final con puntaje registrado.</td></tr>
+              <tr><td><strong>🏆 Ranking</strong></td><td>Podio y tabla de clasificación visible para todos los estudiantes. Fomenta la sana competencia.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RECOMENDACIONES -->
+      <div class="manual-section">
+        <h3 class="msec-title">✅ Recomendaciones para el uso en clase</h3>
+        <div class="manual-tip-list">
+          <div class="mtip">📌 Pide a los estudiantes que empiecen siempre por la sección <strong>Aprende</strong> antes de hacer ejercicios.</div>
+          <div class="mtip">📌 Usa la sección <strong>Aula Virtual</strong> para guiar la clase con la secuencia didáctica completa.</div>
+          <div class="mtip">📌 El <strong>Kahoot</strong> es ideal para cerrar la sesión o como actividad de repaso grupal.</div>
+          <div class="mtip">📌 Exporta el CSV al final de cada sesión para llevar un registro externo de los resultados.</div>
+          <div class="mtip">📌 Los datos se guardan en el dispositivo del estudiante. Para ver todos los resultados, los estudiantes deben usar el mismo dispositivo o servidor.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="manual-footer">
+      <span>🌟 Let's Learn To Be! · Grupo IEV-96 · Maestría en Recursos Digitales · Universidad de Cartagena</span>
+      <button class="btn btn-primary" onclick="closeManual('teacher')" style="width:auto;padding:.6rem 1.4rem">Cerrar ✕</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =============================================
+   Let's Learn To Be! — JavaScript
+   Grupo IEV-96
+   Maestría en Recursos Digitales · U. Cartagena
+   ============================================= */
+
+'use strict';
+
+// ── CONSTANTS ──────────────────────────────────
+const TEACHER_USER = 'Recursos.Digitales';
+const TEACHER_PASS = 'RecursosDigitales1234';
+
+const MOTIVATIONAL = [
+  '¡Cada ejercicio te acerca más al dominio del inglés! 🚀',
+  '¡Eres increíble! Sigue practicando. 💪',
+  'El inglés es tu superpoder. ¡Úsalo! 🦸',
+  '¡Recuerda: I = AM · He/She/It = IS · You/We/They = ARE! 🧠',
+  '¡Tú puedes lograrlo! No te rindas. 🌟',
+  '¡Gran trabajo! Cada error es una lección valiosa. 📚',
+  '¡Sigue adelante! El éxito está muy cerca. 🏆',
+  '¡Learning is fun! Aprender inglés es divertido. 😊',
+  '¡Vas muy bien! Continúa con ese ritmo. ⭐',
+];
+
+const LEVEL_NAMES = ['','Principiante','Básico','Intermedio','Avanzado','Experto'];
+const Q_ILLUSTRATIONS = {easy:['🤔','🧐','💭','📝','✏️'],medium:['🎯','🌟','💡','🔍','🧩'],hard:['🔥','⚡','💪','🏆','🌈']};
+
+// ── APP STATE ──────────────────────────────────
+let S = {
+  name:'', score:0, level:1,
+  pracSesScore:0, pracIdx:0, pracLvl:1, pracPool:[],
+  consCorrect:0, consWrong:0,
+  dragIdx:0, dragScore:0, dragPool:[],
+  kPool:[], kIdx:0, kScore:0, kTimer:null, kTimeLeft:15,
+  musicOn:false,
+};
+
+// ── QUESTIONS DATABASE ─────────────────────────
+
+const PRAC_Q = {
+  1:[
+    {q:'I ___ a student.',opts:['am','is','are','be'],ans:'am',hint:'Con I siempre → AM',scene:'🎓'},
+    {q:'She ___ my friend.',opts:['am','is','are','be'],ans:'is',hint:'He/She/It → IS',scene:'👩‍🎓'},
+    {q:'They ___ happy.',opts:['am','is','are','be'],ans:'are',hint:'You/We/They → ARE',scene:'😊'},
+    {q:'He ___ a teacher.',opts:['am','is','are','be'],ans:'is',hint:'He/She/It → IS',scene:'👨‍🏫'},
+    {q:'We ___ friends.',opts:['am','is','are','be'],ans:'are',hint:'We → ARE',scene:'👫'},
+    {q:'It ___ a cat.',opts:['am','is','are','be'],ans:'is',hint:'It → IS',scene:'🐱'},
+    {q:'You ___ smart!',opts:['am','is','are','be'],ans:'are',hint:'You → ARE',scene:'🧠'},
+    {q:'I ___ 13 years old.',opts:['am','is','are','be'],ans:'am',hint:'Con I siempre → AM',scene:'🎂'},
+  ],
+  2:[
+    {q:"Complete: 'She ___ from Bogotá.'",opts:['am','is','are','were'],ans:'is',hint:'She → IS',scene:'🇨🇴'},
+    {q:"Complete: 'We ___ at school today.'",opts:['am','is','are','was'],ans:'are',hint:'We → ARE',scene:'🏫'},
+    {q:"'My classmate and I ___ students.' (Mi compañero y yo...)",opts:['am','is','are','be'],ans:'are',hint:'Mi compañero + I = We → ARE',scene:'👥'},
+    {q:'¿Cuál es correcta? "El gato está en la mesa."',opts:['The cat are on the table.','The cat is on the table.','The cat am on the table.','The cat be on the table.'],ans:'The cat is on the table.',hint:'The cat = It → IS',scene:'🐱'},
+    {q:"'They ___ Colombian.'",opts:['am','is','are','be'],ans:'are',hint:'They → ARE',scene:'🇨🇴'},
+    {q:"'___ you ready?' – 'Yes, I am.'",opts:['Am','Is','Are','Be'],ans:'Are',hint:'Para preguntar con you usa ARE al inicio',scene:'🙋'},
+    {q:"¿Cuál contracción es correcta para 'She is'?",opts:["she'm","she's","she're","she'is"],ans:"she's",hint:"She + is = She's",scene:'💬'},
+    {q:"'The students ___ from Medellín.'",opts:['am','is','are','be'],ans:'are',hint:'Students = They → ARE',scene:'📚'},
+  ],
+  3:[
+    {q:"Elige la oración INCORRECTA:",opts:['I am a student.','He are tall.','They are ready.','She is my sister.'],ans:'He are tall.',hint:"He → IS, no ARE. Correcto: 'He is tall.'",scene:'❌'},
+    {q:"'___ the students Colombian?' → 'Yes, they ___.'",opts:['Is / is','Are / are','Am / am','Are / is'],ans:'Are / are',hint:'Students = They → ARE',scene:'🇨🇴'},
+    {q:"Transforma a negativo: 'I am late.'",opts:['I am not late.','I is not late.','I are not late.','I no am late.'],ans:'I am not late.',hint:'I + am + not → I am not',scene:'⏰'},
+    {q:"¿Cuál contracción es CORRECTA?",opts:["She'is tall.","They're happy.","He'are a boy.","I'is ready."],ans:"They're happy.",hint:'They + are = They\'re',scene:'✅'},
+    {q:"Forma la pregunta: 'She is from Cartagena.'",opts:['She is from Cartagena?','Is she from Cartagena?','Are she from Cartagena?','She are from Cartagena?'],ans:'Is she from Cartagena?',hint:"Invierte: IS + she → Is she?",scene:'❓'},
+    {q:"Elige la traducción correcta: 'Estamos en el parque.'",opts:['We is in the park.','They are in the park.','We are in the park.','I am in the park.'],ans:'We are in the park.',hint:'Nosotros = We → ARE',scene:'🌳'},
+    {q:"¿Cuál oración tiene el significado 'Ella no es médica'?",opts:["She isn't a doctor.","She aren't a doctor.","She amn't a doctor.","She not is a doctor."],ans:"She isn't a doctor.",hint:"She is not → She isn't",scene:'🏥'},
+    {q:"'___ I late?' La respuesta correcta es:",opts:['Am I late?','Is I late?','Are I late?','Be I late?'],ans:'Am I late?',hint:'Con I usa AM para preguntar',scene:'⏰'},
+  ],
+};
+
+const DRAG_EX = [
+  {parts:['I','_','a student.'],ans:'am',hint:'Yo soy un/a estudiante.',scene:'🎓'},
+  {parts:['She','_','my teacher.'],ans:'is',hint:'Ella es mi maestra.',scene:'👩‍🏫'},
+  {parts:['They','_','from Colombia.'],ans:'are',hint:'Ellos son de Colombia.',scene:'🇨🇴'},
+  {parts:['He','_','tall and smart.'],ans:'is',hint:'Él es alto e inteligente.',scene:'💪'},
+  {parts:['We','_','happy today.'],ans:'are',hint:'Nosotros estamos felices hoy.',scene:'😊'},
+  {parts:['It','_','a beautiful day.'],ans:'is',hint:'Es un día hermoso.',scene:'☀️'},
+  {parts:['You','_','a great student!'],ans:'are',hint:'¡Tú eres un/a gran estudiante!',scene:'⭐'},
+  {parts:['I','_','from Medellín.'],ans:'am',hint:'Soy de Medellín.',scene:'🌆'},
+];
+
+const KAHOOT_Q = [
+  {q:'I ___ happy today. 😊',opts:['am','is','are','be'],ans:'am'},
+  {q:'She ___ my best friend. 👭',opts:['am','is','are','be'],ans:'is'},
+  {q:'We ___ students in grade 7. 🎓',opts:['am','is','are','be'],ans:'are'},
+  {q:'He ___ from Cartagena. 🇨🇴',opts:['am','is','are','was'],ans:'is'},
+  {q:'They ___ at the library. 📚',opts:['am','is','are','were'],ans:'are'},
+  {q:'It ___ a rainy day. 🌧️',opts:['am','is','are','be'],ans:'is'},
+  {q:'You ___ very intelligent! 🧠',opts:['am','is','are','were'],ans:'are'},
+  {q:"¿Cuál es correcta? 'Ella es alta.' 📏",opts:['She am tall.','She is tall.','She are tall.','She be tall.'],ans:'She is tall.'},
+  {q:"I + am → Contracción correcta: 💬",opts:["I'm","I's","I're","I'be"],ans:"I'm"},
+  {q:"¿Qué forma del verbo To Be va con He/She/It? 🤔",opts:['am','is','are','be'],ans:'is'},
+];
+
+const GUIDED_Q = [
+  {s:'I ___ from Colombia.',ans:'am',opts:['am','is','are']},
+  {s:'She ___ a doctor.',ans:'is',opts:['am','is','are']},
+  {s:'We ___ classmates.',ans:'are',opts:['am','is','are']},
+  {s:'He ___ 14 years old.',ans:'is',opts:['am','is','are']},
+  {s:'They ___ at the park.',ans:'are',opts:['am','is','are']},
+];
+
+const EVAL_Q = [
+  {q:'I ___ a student.',opts:['am','is','are','be'],ans:'am'},
+  {q:'She ___ my sister.',opts:['am','is','are','be'],ans:'is'},
+  {q:'They ___ Colombian.',opts:['am','is','are','be'],ans:'are'},
+  {q:'He ___ tall.',opts:['am','is','are','be'],ans:'is'},
+  {q:'We ___ happy.',opts:['am','is','are','be'],ans:'are'},
+];
+
+// ── AUDIO ENGINE ───────────────────────────────
+let _ctx = null;
+function ac(){if(!_ctx)try{_ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}return _ctx}
+function beep(freq,dur,type='sine',vol=0.3){
+  const c=ac();if(!c)return;
+  try{
+    const o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type=type;o.frequency.setValueAtTime(freq,c.currentTime);
+    g.gain.setValueAtTime(vol,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+dur);
+    o.start(c.currentTime);o.stop(c.currentTime+dur);
+  }catch(e){}
+}
+function sndCorrect(){beep(523,.1);setTimeout(()=>beep(659,.1),110);setTimeout(()=>beep(784,.22),220)}
+function sndWrong(){beep(220,.15,'square',.18);setTimeout(()=>beep(180,.3,'square',.12),150)}
+function sndClick(){beep(440,.07,'sine',.12)}
+function sndStart(){beep(392,.1);setTimeout(()=>beep(523,.1),120);setTimeout(()=>beep(659,.1),240);setTimeout(()=>beep(784,.3),360)}
+
+// Background music (simple oscillator melody)
+let musicNodes = [];
+let musicPlaying = false;
+function toggleMusic(){
+  musicPlaying=!musicPlaying;
+  document.getElementById('music-fab').textContent=musicPlaying?'🔇':'🎵';
+  if(musicPlaying)playBgMusic();else stopBgMusic();
+}
+function playBgMusic(){
+  const c=ac();if(!c)return;
+  const melody=[261,293,329,349,392,440,493,523];
+  let i=0;
+  function playNote(){
+    if(!musicPlaying)return;
+    const o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type='sine';o.frequency.setValueAtTime(melody[i%melody.length],c.currentTime);
+    g.gain.setValueAtTime(0.04,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.4);
+    o.start(c.currentTime);o.stop(c.currentTime+0.45);
+    musicNodes.push(o);i++;
+    setTimeout(playNote,500);
+  }
+  playNote();
+}
+function stopBgMusic(){musicNodes.forEach(n=>{try{n.stop()}catch(e){}});musicNodes=[]}
+
+// ── STARS GENERATOR ────────────────────────────
+function genStars(){
+  const el=document.getElementById('stars');
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()*3+1;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--delay:${Math.random()*5}s`;
+    el.appendChild(s);
+  }
+}
+
+// ── UTILS ──────────────────────────────────────
+function toast(msg,dur=2600){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),dur);
+}
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r}
+function getLevel(sc){if(sc<50)return 1;if(sc<150)return 2;if(sc<300)return 3;if(sc<500)return 4;return 5}
+function rand(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+function updateUI(){
+  const lvl=getLevel(S.score);S.level=lvl;
+  document.getElementById('chip-score').textContent=S.score;
+  document.getElementById('ban-pts').textContent=S.score;
+  document.getElementById('ban-level').textContent=lvl;
+  document.getElementById('ban-level-name').textContent=LEVEL_NAMES[lvl];
+  document.getElementById('sb-bar').style.width=Math.min(100,(S.score/500)*100)+'%';
+  document.getElementById('sb-level-txt').textContent=`Nivel ${lvl} · ${LEVEL_NAMES[lvl]}`;
+}
+function addPts(n){S.score+=n;if(S.score<0)S.score=0;updateUI();saveUser()}
+
+// ── LOCALSTORAGE ───────────────────────────────
+function saveUser(){
+  let users=JSON.parse(localStorage.getItem('ltb2_users')||'[]');
+  const idx=users.findIndex(u=>u.name===S.name);
+  const d={name:S.name,score:S.score,level:getLevel(S.score),date:new Date().toLocaleDateString('es-CO')};
+  if(idx>=0){if(S.score>users[idx].score)users[idx]=d;}else users.push(d);
+  localStorage.setItem('ltb2_users',JSON.stringify(users));
+  localStorage.setItem('ltb2_current',JSON.stringify(d));
+}
+function loadUser(){
+  const d=JSON.parse(localStorage.getItem('ltb2_current')||'null');
+  if(d){S.name=d.name;S.score=d.score||0}
+}
+
+// ── LOGIN/LOGOUT ───────────────────────────────
+function loginStudent(){
+  const n=document.getElementById('inp-name').value.trim();
+  if(!n){
+    const inp=document.getElementById('inp-name');
+    inp.style.borderColor='var(--red)';
+    inp.style.animation='shake .4s ease';
+    setTimeout(()=>{ inp.style.animation=''; },450);
+    toast('✏️ Escribe tu nombre para continuar 😊');
+    return;
+  }
+  document.getElementById('inp-name').style.borderColor='';
+  S.name=n;
+  S.authenticated=true; // Sesión de estudiante válida
+  const users=JSON.parse(localStorage.getItem('ltb2_users')||'[]');
+  const ex=users.find(u=>u.name===n);
+  if(ex){S.score=ex.score;toast(`¡Bienvenido de vuelta, ${n}! 🎉`)}
+  else{S.score=0;toast(`¡Bienvenido/a, ${n}! 🌟`)}
+  document.getElementById('chip-name').textContent=n;
+  document.getElementById('ban-name').textContent=n;
+  document.getElementById('screen-login').classList.remove('active');
+  document.getElementById('screen-app').classList.add('active');
+  document.body.classList.remove('locked'); // Desbloquear scroll
+  document.getElementById('music-fab').classList.add('visible');
+  updateUI();
+  document.getElementById('mot-text').textContent=rand(MOTIVATIONAL);
+  showSec('home');saveUser();
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+  sndStart();
+}
+
+function logoutStudent(){
+  saveUser();
+  S.authenticated=false; // Limpiar sesión
+  document.body.classList.add('locked'); // Re-bloquear scroll
+  document.getElementById('screen-app').classList.remove('active');
+  document.getElementById('screen-login').classList.add('active');
+  document.getElementById('music-fab').classList.remove('visible');
+  document.getElementById('inp-name').value='';
+  stopBgMusic();musicPlaying=false;
+  document.getElementById('music-fab').textContent='🎵';
+  if(S.kTimer)clearInterval(S.kTimer);
+  showRoleSelector(); // Volver al selector de rol
+}
+
+// ── MANUAL OPEN / CLOSE ────────────────────────
+function openManual(role){
+  const id = role === 'student' ? 'manual-student' : 'manual-teacher';
+  document.getElementById(id).style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  sndClick();
+}
+function closeManual(role){
+  const id = role === 'student' ? 'manual-student' : 'manual-teacher';
+  document.getElementById(id).style.display = 'none';
+  document.body.style.overflow = '';
+}
+// Close manual on backdrop click
+document.addEventListener('click', e => {
+  ['manual-student','manual-teacher'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el && e.target === el) closeManual(id.includes('student') ? 'student' : 'teacher');
+  });
+});
+// Close manual on Escape key
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    closeManual('student');
+    closeManual('teacher');
+  }
+});
+
+// ── TOGGLE PASSWORD VISIBILITY ─────────────────
+function togglePassVisibility(){
+  const inp = document.getElementById('t-pass-inline');
+  const btn = document.getElementById('btn-toggle-pass');
+  if(inp.type === 'password'){
+    inp.type = 'text';
+    btn.textContent = '🙈';
+    btn.title = 'Ocultar contraseña';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁️';
+    btn.title = 'Mostrar contraseña';
+  }
+}
+
+// ── ROLE SELECTOR / PANEL SWITCHER ─────────────
+function showPanel(role){
+  document.getElementById('role-selector').style.display = role==='selector' ? 'flex' : 'none';
+  document.getElementById('panel-student').style.display  = role==='student'  ? 'block' : 'none';
+  document.getElementById('panel-teacher').style.display  = role==='teacher'  ? 'block' : 'none';
+  // Clear fields when switching
+  if(role==='student'){ document.getElementById('inp-name').value=''; }
+  if(role==='teacher'){
+    document.getElementById('t-user-inline').value='';
+    document.getElementById('t-pass-inline').value='';
+    document.getElementById('t-err-inline').style.display='none';
+  }
+  sndClick();
+}
+
+// ── TEACHER ACCESS (inline panel) ───────────────
+function openTeacherModal(){ showPanel('teacher'); } // compat alias
+function closeTeacherModal(){ showPanel('selector'); }
+
+function loginTeacherInline(){
+  const u = document.getElementById('t-user-inline').value.trim();
+  const p = document.getElementById('t-pass-inline').value;
+  if(u===TEACHER_USER && p===TEACHER_PASS){
+    S.authenticated=true;
+    document.getElementById('screen-login').classList.remove('active');
+    document.getElementById('screen-teacher').classList.add('active');
+    document.body.classList.remove('locked');
+    // Hide teacher FAB while on teacher panel
+    document.getElementById('teacher-fab').classList.add('hidden');
+    loadTeacherDashboard();
+    sndStart();
+  }else{
+    document.getElementById('t-err-inline').style.display='block';
+    const inp = document.getElementById('t-pass-inline');
+    inp.style.animation='shake .4s ease';
+    setTimeout(()=>inp.style.animation='',450);
+    sndWrong();
+  }
+}
+function loginTeacher(){ loginTeacherInline(); } // compat alias
+
+function logoutTeacher(){
+  S.authenticated=false; // Limpiar sesión
+  document.body.classList.add('locked'); // Re-bloquear scroll
+  document.getElementById('screen-teacher').classList.remove('active');
+  document.getElementById('screen-login').classList.add('active');
+  showRoleSelector(); // Volver al selector de rol
+}
+
+function loadTeacherDashboard(){
+  const users=JSON.parse(localStorage.getItem('ltb2_users')||'[]');
+  const sorted=[...users].sort((a,b)=>b.score-a.score);
+
+  // Stats
+  const grid=document.getElementById('t-stats-grid');
+  const total=sorted.length;
+  const avgScore=total?Math.round(sorted.reduce((a,b)=>a+b.score,0)/total):0;
+  const top=sorted[0];
+  grid.innerHTML=`
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Estudiantes registrados</div></div>
+    <div class="stat-card"><div class="stat-num">${avgScore}</div><div class="stat-label">Puntaje promedio</div></div>
+    <div class="stat-card"><div class="stat-num">${top?top.score:0}</div><div class="stat-label">Puntaje más alto</div></div>
+    <div class="stat-card"><div class="stat-num">${top?top.name.split(' ')[0]:'-'}</div><div class="stat-label">Estudiante líder</div></div>
+  `;
+
+  // Table
+  const tbody=document.getElementById('t-tbody');
+  const empty=document.getElementById('t-empty');
+  if(!sorted.length){tbody.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+  const medals=['🥇','🥈','🥉'];
+  tbody.innerHTML=sorted.map((u,i)=>`
+    <tr>
+      <td><span class="rank-icon">${medals[i]||i+1}</span></td>
+      <td><strong>${u.name}</strong></td>
+      <td><span class="score-pill">⭐ ${u.score}</span></td>
+      <td><span class="level-pill">${LEVEL_NAMES[u.level]||'Principiante'}</span></td>
+      <td style="color:rgba(255,255,255,.45);font-size:.82rem">${u.date||'-'}</td>
+    </tr>`).join('');
+}
+
+function refreshTeacher(){loadTeacherDashboard();toast('✅ Tabla actualizada')}
+
+function resetAllData(){
+  if(confirm('¿Seguro que deseas borrar TODOS los datos de los estudiantes?')){
+    localStorage.removeItem('ltb2_users');
+    localStorage.removeItem('ltb2_current');
+    loadTeacherDashboard();
+    toast('🗑️ Datos reiniciados');
+  }
+}
+
+function exportCSV(){
+  const users=JSON.parse(localStorage.getItem('ltb2_users')||'[]');
+  if(!users.length){toast('No hay datos para exportar');return}
+  const sorted=[...users].sort((a,b)=>b.score-a.score);
+  let csv='Puesto,Nombre,Puntaje,Nivel,Fecha\n';
+  sorted.forEach((u,i)=>{csv+=`${i+1},"${u.name}",${u.score},${LEVEL_NAMES[u.level]||''},${u.date||''}\n`});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='resultados_letstobe.csv';a.click();
+  toast('📥 CSV descargado');
+}
+
+// ── NAVIGATION ─────────────────────────────────
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('on');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('on');
+}
+
+function showSec(id){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelector(`.nav-a[data-sec="${id}"]`)?.classList.add('active');
+  closeSidebar();sndClick();
+  if(id==='practice')initPractice();
+  if(id==='drag')initDrag();
+  if(id==='ranking')renderRanking();
+  if(id==='classroom')initClassroom();
+  if(id==='home'){document.getElementById('mot-text').textContent=rand(MOTIVATIONAL)}
+}
+
+// ── LEARN TABS ─────────────────────────────────
+function showTab(id){
+  document.querySelectorAll('.tcontent').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.t-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const ids=['t-intro','t-forms','t-examples','t-situations','t-neg','t-quest'];
+  const i=ids.indexOf(id);
+  document.querySelectorAll('.t-btn')[i]?.classList.add('active');
+  sndClick();
+}
+
+// ── PRACTICE ADAPTIVE ──────────────────────────
+let pracSesScore=0;
+function initPractice(){
+  S.pracLvl=1;S.pracIdx=0;pracSesScore=0;
+  S.consCorrect=0;S.consWrong=0;
+  S.pracPool=shuffle([...PRAC_Q[1]]);
+  document.getElementById('prac-done').style.display='none';
+  document.getElementById('prac-q-card').style.display='block';
+  renderPracQ();updatePracMeta();
+}
+function resetPractice(){initPractice()}
+
+function updatePracMeta(){
+  const names={1:'⭐ Nivel 1 – Fácil',2:'🌟 Nivel 2 – Medio',3:'🔥 Nivel 3 – Difícil'};
+  const cl={1:'lvl-1',2:'lvl-2',3:'lvl-3'};
+  const b=document.getElementById('prac-lvl-badge');
+  b.textContent=names[S.pracLvl];b.className='lvl-badge '+cl[S.pracLvl];
+  document.getElementById('prac-ses-score').textContent=pracSesScore;
+}
+
+function renderPracQ(){
+  if(S.pracIdx>=Math.min(10,S.pracPool.length)){endPractice();return}
+  const q=S.pracPool[S.pracIdx];
+  document.getElementById('prac-counter').textContent=`Pregunta ${S.pracIdx+1}/10`;
+  const illArr=Q_ILLUSTRATIONS[S.pracLvl===1?'easy':S.pracLvl===2?'medium':'hard'];
+  document.getElementById('prac-illus').textContent=q.scene||rand(illArr);
+  document.getElementById('prac-q-text').textContent=q.q;
+  const grid=document.getElementById('prac-opts');
+  grid.innerHTML='';
+  shuffle(q.opts).forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='opt-btn';b.textContent=opt;
+    b.onclick=()=>checkPrac(opt,q,b);
+    grid.appendChild(b);
+  });
+  const fb=document.getElementById('prac-fb');
+  fb.className='fb-box';fb.style.display='none';
+}
+
+function checkPrac(sel,q,btn){
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('prac-fb');
+  if(sel===q.ans){
+    btn.classList.add('right');
+    S.consCorrect++;S.consWrong=0;
+    const pts=S.pracLvl*10;pracSesScore+=pts;addPts(pts);
+    const msgs=['¡Excelente! 🎉','¡Muy bien! 👏','¡Correcto! ⭐','¡Genial! 🌟','¡Perfecto! 💯'];
+    fb.textContent=rand(msgs)+` +${pts} puntos`;fb.className='fb-box fb-ok';
+    sndCorrect();
+    if(S.consCorrect>=2&&S.pracLvl<3){
+      S.pracLvl++;S.consCorrect=0;
+      S.pracPool=[...S.pracPool,...shuffle(PRAC_Q[S.pracLvl])];
+      toast('¡Subiste de nivel! 🚀 Ahora en Nivel '+S.pracLvl);
+    }
+  }else{
+    btn.classList.add('wrong');
+    document.querySelectorAll('.opt-btn').forEach(b=>{if(b.textContent===q.ans)b.classList.add('right')});
+    S.consWrong++;S.consCorrect=0;
+    fb.textContent=`❌ La respuesta es "${q.ans}". Pista: ${q.hint}`;fb.className='fb-box fb-err';
+    sndWrong();
+    if(S.consWrong>=2&&S.pracLvl>1){
+      S.pracLvl--;S.consWrong=0;
+      S.pracPool=[...shuffle(PRAC_Q[S.pracLvl]),...S.pracPool.slice(S.pracIdx+1)];
+      toast('📚 Repasemos el nivel anterior...');
+    }
+  }
+  S.pracIdx++;updatePracMeta();
+  setTimeout(renderPracQ,1800);
+}
+
+function endPractice(){
+  document.getElementById('prac-q-card').style.display='none';
+  document.getElementById('prac-done').style.display='block';
+  document.getElementById('prac-final-pts').textContent=pracSesScore;
+  let msg=pracSesScore>=80?'🏆 ¡Fantástico! Dominas muy bien el verbo To Be.':pracSesScore>=40?'💪 ¡Buen resultado! Sigue practicando.':'📚 ¡Sigue intentando! La práctica hace al maestro.';
+  document.getElementById('prac-final-msg').textContent=msg;
+}
+
+// ── DRAG & DROP ────────────────────────────────
+let dragFilled=false,dragAns='';
+
+function initDrag(){
+  S.dragPool=shuffle([...DRAG_EX]);S.dragIdx=0;S.dragScore=0;
+  document.getElementById('drag-done').style.display='none';
+  document.getElementById('drag-area').style.display='';
+  document.getElementById('drag-opts').style.display='';
+  renderDrag();
+}
+function resetDrag(){initDrag()}
+
+function renderDrag(){
+  if(S.dragIdx>=S.dragPool.length){endDrag();return}
+  const ex=S.dragPool[S.dragIdx];
+  dragAns=ex.ans;dragFilled=false;
+  document.getElementById('drag-score').textContent=S.dragScore;
+  document.getElementById('drag-ctr').textContent=S.dragIdx+1;
+  document.getElementById('drag-fb').textContent='';
+  document.getElementById('drag-scene').textContent=ex.scene;
+  document.getElementById('btn-drag-next').style.display='none';
+  document.getElementById('drag-hint').textContent='('+ex.hint+')';
+
+  // Build sentence with blank
+  const sentEl=document.getElementById('drag-sentence');
+  sentEl.innerHTML='';
+  ex.parts.forEach(p=>{
+    if(p==='_'){
+      const sp=document.createElement('span');
+      sp.className='drag-blank';sp.id='drag-blank';sp.textContent='___';
+      sp.onclick=()=>{if(dragFilled)clearDragBlank()};
+      sentEl.appendChild(sp);
+    }else{
+      const sp=document.createElement('span');sp.textContent=p+' ';sentEl.appendChild(sp);
+    }
+  });
+
+  // Options
+  const optsEl=document.getElementById('drag-opts');
+  optsEl.innerHTML='';
+  shuffle(['am','is','are']).forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='drag-chip';b.textContent=opt;b.id='dopt-'+opt;
+    b.onclick=()=>selectDrag(opt,b);optsEl.appendChild(b);
+  });
+}
+
+function selectDrag(opt,btn){
+  if(dragFilled)return;sndClick();dragFilled=true;
+  const blank=document.getElementById('drag-blank');
+  blank.textContent=opt;blank.classList.add('filled');
+  btn.classList.add('used');
+  setTimeout(()=>{
+    if(opt===dragAns){
+      blank.classList.remove('filled');blank.classList.add('ok');
+      document.getElementById('drag-fb').textContent='✅ ¡Correcto! +15 puntos';
+      document.getElementById('drag-fb').style.color='var(--green)';
+      S.dragScore++;addPts(15);sndCorrect();
+    }else{
+      blank.classList.remove('filled');blank.classList.add('bad');
+      document.getElementById('drag-fb').textContent=`❌ Era "${dragAns}". ¡Inténtalo de nuevo!`;
+      document.getElementById('drag-fb').style.color='var(--red)';
+      setTimeout(()=>{const b=document.getElementById('drag-blank');if(b)b.textContent=dragAns},400);
+      sndWrong();
+    }
+    S.dragIdx++;document.getElementById('btn-drag-next').style.display='inline-flex';
+  },600);
+}
+function clearDragBlank(){
+  const b=document.getElementById('drag-blank');
+  b.textContent='___';b.className='drag-blank';dragFilled=false;
+  document.querySelectorAll('.drag-chip').forEach(c=>c.classList.remove('used'));
+}
+function nextDrag(){sndClick();renderDrag()}
+function endDrag(){
+  document.getElementById('drag-area').style.display='none';
+  document.getElementById('drag-opts').style.display='none';
+  document.getElementById('drag-done').style.display='block';
+  document.getElementById('drag-final').textContent=S.dragScore;
+}
+
+// ── KAHOOT ─────────────────────────────────────
+let kPool=[];
+function startKahoot(){
+  kPool=shuffle([...KAHOOT_Q]);S.kIdx=0;S.kScore=0;
+  document.getElementById('k-lobby').style.display='none';
+  document.getElementById('k-end').style.display='none';
+  document.getElementById('k-game').style.display='block';
+  sndStart();renderKahoot();
+}
+function renderKahoot(){
+  if(S.kIdx>=kPool.length){endKahoot();return}
+  const q=kPool[S.kIdx];
+  document.getElementById('k-q-num').textContent=S.kIdx+1;
+  document.getElementById('k-pts').textContent=S.kScore;
+  document.getElementById('k-q-text').textContent=q.q;
+  document.getElementById('k-fb').textContent='';
+  const optsEl=document.getElementById('k-opts');
+  optsEl.innerHTML='';
+  const symb=['🔴','🔵','🟢','🟡'];
+  shuffle(q.opts).forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='k-opt';b.innerHTML=`${symb[i]} ${opt}`;
+    b.onclick=()=>checkKahoot(opt,q,b);optsEl.appendChild(b);
+  });
+  // Timer
+  S.kTimeLeft=15;updateKTimer(15,15);
+  document.getElementById('k-time-num').textContent=15;
+  clearInterval(S.kTimer);
+  S.kTimer=setInterval(()=>{
+    S.kTimeLeft--;
+    document.getElementById('k-time-num').textContent=S.kTimeLeft;
+    updateKTimer(S.kTimeLeft,15);
+    if(S.kTimeLeft<=0){
+      clearInterval(S.kTimer);
+      document.querySelectorAll('.k-opt').forEach(b=>{b.disabled=true;if(b.textContent.includes(q.ans))b.classList.add('ok-k');else b.classList.add('no-k')});
+      document.getElementById('k-fb').textContent='⏰ ¡Tiempo agotado!';sndWrong();
+      S.kIdx++;setTimeout(renderKahoot,1800);
+    }
+  },1000);
+}
+function updateKTimer(cur,tot){
+  const c=document.getElementById('k-circle');
+  const circ=188.5;c.style.strokeDashoffset=circ-(cur/tot)*circ;
+  c.style.stroke=cur<=5?'var(--red)':cur<=8?'#f39c12':'var(--purple)';
+}
+function checkKahoot(sel,q,btn){
+  clearInterval(S.kTimer);
+  document.querySelectorAll('.k-opt').forEach(b=>b.disabled=true);
+  if(sel===q.ans){
+    btn.classList.add('ok-k');
+    const bonus=Math.ceil(S.kTimeLeft*10);const pts=50+bonus;
+    S.kScore+=pts;addPts(pts);
+    document.getElementById('k-fb').textContent=`✅ ¡Correcto! +${pts} pts (rapidez: +${bonus})`;
+    sndCorrect();
+  }else{
+    btn.classList.add('no-k');
+    document.querySelectorAll('.k-opt').forEach(b=>{if(b.textContent.includes(q.ans))b.classList.add('ok-k')});
+    document.getElementById('k-fb').textContent=`❌ Era: "${q.ans}"`;sndWrong();
+  }
+  document.getElementById('k-pts').textContent=S.kScore;
+  S.kIdx++;setTimeout(renderKahoot,2000);
+}
+function endKahoot(){
+  clearInterval(S.kTimer);
+  document.getElementById('k-game').style.display='none';
+  document.getElementById('k-end').style.display='block';
+  document.getElementById('k-final-pts').textContent=S.kScore;
+  document.getElementById('k-rank-msg').textContent=S.kScore>=400?'🏆 ¡Campeón! Dominas el verbo To Be.':S.kScore>=200?'⭐ ¡Muy buen resultado!':'📚 ¡Buen intento! Repasa y vuelve.';
+  saveUser();
+}
+function restartKahoot(){document.getElementById('k-end').style.display='none';document.getElementById('k-lobby').style.display='block'}
+
+// ── CLASSROOM ──────────────────────────────────
+function initClassroom(){
+  showClStep(1);
+  // Step 2 guided
+  const gl=document.getElementById('guided-list');
+  gl.innerHTML=GUIDED_Q.map((q,i)=>{
+    const parts=q.s.split('___');
+    return `<div class="g-item">
+      <span>${parts[0]}</span>
+      <select id="gs${i}">
+        <option value="">---</option>
+        ${q.opts.map(o=>`<option value="${o}">${o}</option>`).join('')}
+      </select>
+      <span>${parts[1]||''}</span>
+    </div>`;
+  }).join('');
+  // Step 3 eval
+  const el=document.getElementById('eval-list');
+  el.innerHTML=EVAL_Q.map((q,i)=>`
+    <div class="e-item">
+      <p>${i+1}. ${q.q}</p>
+      ${q.opts.map(o=>`<label><input type="radio" name="eq${i}" value="${o}"> ${o}</label>`).join('')}
+    </div>`).join('');
+  document.getElementById('eval-result').style.display='none';
+  document.getElementById('btn-eval').style.display='flex';
+  document.getElementById('guided-fb').className='guided-fb';
+  document.getElementById('eval-fb').className='eval-fb';
+  // Reset step dots
+  for(let i=1;i<=3;i++){
+    const d=document.getElementById('sd'+i);d.className='st-dot';
+    if(i<3){const l=document.getElementById('sl'+i);l.className='st-line'}
+  }
+  document.getElementById('sd1').classList.add('active');
+}
+
+function showClStep(n){
+  document.querySelectorAll('.cl-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('cl-step-'+n).classList.add('active');
+}
+function clStep(n){
+  sndClick();
+  for(let i=1;i<n;i++){
+    document.getElementById('sd'+i).className='st-dot done';
+    if(i<3)document.getElementById('sl'+i).className='st-line done';
+  }
+  document.getElementById('sd'+n).className='st-dot active';
+  showClStep(n);
+}
+
+function checkGuided(){
+  let ok=0;
+  GUIDED_Q.forEach((q,i)=>{
+    const s=document.getElementById('gs'+i);
+    s.style.borderColor=s.value===q.ans?'var(--green)':'var(--red)';
+    if(s.value===q.ans)ok++;
+  });
+  const fb=document.getElementById('guided-fb');
+  if(ok===GUIDED_Q.length){
+    fb.textContent=`✅ ¡Perfecto! Todas correctas. +${ok*5} puntos`;fb.className='guided-fb ok-fb';
+    addPts(ok*5);sndCorrect();setTimeout(()=>clStep(3),1600);
+  }else{
+    fb.textContent=`❌ ${ok}/${GUIDED_Q.length} correctas. Revisa los errores.`;fb.className='guided-fb err-fb';sndWrong();
+  }
+}
+function submitEval(){
+  let ok=0;
+  EVAL_Q.forEach((q,i)=>{const r=document.querySelector(`input[name="eq${i}"]:checked`);if(r&&r.value===q.ans)ok++});
+  const res=document.getElementById('eval-result');
+  document.getElementById('eval-score').textContent=ok;
+  document.getElementById('eval-msg').textContent=ok===5?'🏆 ¡Evaluación perfecta!':ok>=3?'👍 ¡Buen trabajo! Sigue practicando.':'📚 Repasa la teoría e inténtalo de nuevo.';
+  addPts(ok*20);
+  document.getElementById('btn-eval').style.display='none';
+  res.style.display='block';
+  document.getElementById('sd3').classList.add('done');
+  ok>=3?sndCorrect():sndWrong();saveUser();
+}
+function restartClassroom(){initClassroom()}
+
+// ── RANKING ────────────────────────────────────
+function renderRanking(){
+  const users=JSON.parse(localStorage.getItem('ltb2_users')||'[]');
+  const sorted=[...users].sort((a,b)=>b.score-a.score);
+  // Podium
+  const podEl=document.getElementById('podium');
+  podEl.innerHTML='';
+  const order=[{cls:'p-silver',medal:'🥈',i:1},{cls:'p-gold',medal:'🥇',i:0},{cls:'p-bronze',medal:'🥉',i:2}];
+  order.forEach(o=>{
+    const u=sorted[o.i];if(!u)return;
+    const d=document.createElement('div');d.className='p-place '+o.cls;
+    d.innerHTML=`<div class="p-medal">${o.medal}</div><div class="p-name">${u.name}</div><div class="p-pts">⭐ ${u.score}</div>`;
+    podEl.appendChild(d);
+  });
+  // List
+  const listEl=document.getElementById('rank-list');
+  if(!sorted.length){listEl.innerHTML='<div class="rank-empty">🏅 Aún no hay resultados. ¡Sé el primero!</div>';return}
+  listEl.innerHTML=sorted.map((u,i)=>`
+    <div class="rank-row${u.name===S.name?' me':''}">
+      <div class="rk-num">${i+1}</div>
+      <div class="rk-name">${u.name}${u.name===S.name?' 👈 Tú':''}</div>
+      <div class="rk-level">${LEVEL_NAMES[u.level]||'Principiante'}</div>
+      <div class="rk-score">⭐ ${u.score}</div>
+    </div>`).join('');
+}
+function clearRanking(){
+  if(confirm('¿Borrar el ranking?')){localStorage.removeItem('ltb2_users');renderRanking();toast('🗑️ Ranking limpiado')}
+}
+
+// ── KEYBOARD ───────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const loginActive=document.getElementById('screen-login').classList.contains('active');
+    if(!loginActive) return;
+    // Panel estudiante visible
+    if(document.getElementById('panel-student').style.display!=='none') loginStudent();
+    // Panel docente visible
+    if(document.getElementById('panel-teacher').style.display!=='none') loginTeacherInline();
+  }
+});
+
+// ── ROLE SELECTOR ──────────────────────────────
+function showRoleSelector(){
+  document.getElementById('role-selector').style.display='flex';
+  document.getElementById('panel-student').style.display='none';
+  document.getElementById('panel-teacher').style.display='none';
+}
+
+function showRolePanel(role){
+  sndClick();
+  document.getElementById('role-selector').style.display='none';
+  if(role==='student'){
+    document.getElementById('panel-student').style.display='block';
+    setTimeout(()=>document.getElementById('inp-name').focus(),100);
+  } else {
+    document.getElementById('panel-teacher').style.display='block';
+    setTimeout(()=>document.getElementById('t-user-inline').focus(),100);
+  }
+}
+
+// Login docente directo (inline, sin modal)
+function loginTeacherInline(){
+  const u=document.getElementById('t-user-inline').value.trim();
+  const p=document.getElementById('t-pass-inline').value;
+  const errEl=document.getElementById('t-err-inline');
+  if(u===TEACHER_USER && p===TEACHER_PASS){
+    errEl.style.display='none';
+    S.authenticated=true;
+    document.getElementById('screen-login').classList.remove('active');
+    document.getElementById('screen-teacher').classList.add('active');
+    document.body.classList.remove('locked');
+    loadTeacherDashboard();
+    sndStart();
+    // Limpiar campos
+    document.getElementById('t-user-inline').value='';
+    document.getElementById('t-pass-inline').value='';
+  } else {
+    errEl.style.display='block';
+    const inputs=[document.getElementById('t-user-inline'),document.getElementById('t-pass-inline')];
+    inputs.forEach(i=>{i.style.animation='shake .4s ease';setTimeout(()=>i.style.animation='',450)});
+    sndWrong();
+  }
+}
+
+// ── VIDEO ERROR HANDLER ────────────────────────
+// Muestra aviso si tobe.mp4 no se encuentra en la carpeta
+document.addEventListener('DOMContentLoaded', () => {
+  const vid = document.getElementById('lesson-video');
+  if(vid){
+    vid.addEventListener('error', () => {
+      vid.style.display = 'none';
+      document.getElementById('video-missing').style.display = 'flex';
+    });
+  }
+});
+
+// ── ROUTE GUARD ────────────────────────────────
+// Bloquea cualquier acceso al contenido sin sesión válida.
+// Se ejecuta al cargar y en cada navegación.
+function guardRoute(){
+  const appVisible     = document.getElementById('screen-app').classList.contains('active');
+  const teacherVisible = document.getElementById('screen-teacher').classList.contains('active');
+  // Si alguna pantalla de contenido está visible sin sesión válida → forzar login
+  if((appVisible || teacherVisible) && !S.authenticated){
+    document.getElementById('screen-app').classList.remove('active');
+    document.getElementById('screen-teacher').classList.remove('active');
+    document.getElementById('screen-login').classList.add('active');
+    document.body.classList.add('locked'); // Asegura que el scroll esté bloqueado
+  }
+  // Si login está activo, siempre asegurar que body esté bloqueado
+  const loginVisible = document.getElementById('screen-login').classList.contains('active');
+  if(loginVisible) document.body.classList.add('locked');
+}
+
+// ── INIT ───────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  // 1. Asegurar estado de autenticación limpio al arrancar
+  S.authenticated = false;
+
+  // 2. Garantizar que SOLO la pantalla de login esté visible
+  document.getElementById('screen-app').classList.remove('active');
+  document.getElementById('screen-teacher').classList.remove('active');
+  document.getElementById('screen-login').classList.add('active');
+  // Bloquear scroll del body — el contenido debajo NO es accesible
+  document.body.classList.add('locked');
+
+  // 3. Mostrar selector de rol al inicio (ocultar paneles individuales)
+  document.getElementById('role-selector').style.display='flex';
+  document.getElementById('panel-student').style.display='none';
+  document.getElementById('panel-teacher').style.display='none';
+  // Limpiar campos del formulario
+  document.getElementById('inp-name').value = '';
+
+  // 4. Generar estrellas animadas del fondo
+  genStars();
+
+  // 5. Registrar Service Worker para PWA
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+  // 6. Protección extra: detectar manipulación del DOM vía DevTools
+  //    Cada 2 segundos verifica que la sesión sea válida
+  setInterval(guardRoute, 2000);
+});
+</script>
+</body>
+</html>
